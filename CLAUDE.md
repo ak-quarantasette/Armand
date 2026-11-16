@@ -7,8 +7,8 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 ## Stato (aggiornato 2026-11-16)
 
 - **Fase in corso**: fasi 1-3 chiuse. Fase 4 (verifiche) fatta con Chromium su telefono, tablet e computer;
-  manca solo la prova su iPhone, che fa l'utente. Fase 5 (pubblicazione) predisposta nella repo: restano i
-  passi che può fare solo l'utente (vedi "Pubblicazione").
+  manca solo la prova su iPhone, che fa l'utente. Fase 5 (pubblicazione) avviata: il sito è su `main`
+  (pull request #1, unita con l'ok dell'utente) e l'utente ha scelto GitHub Pages per la prima anteprima.
 - **Scelte già confermate**: caratteri A, marchio 1, logo in alto a destra con i colori attenuati, apertura a
   mattoni con ombra e spessore, testi approvati (si parla solo di "consulenza gratuita").
 - **Anteprime vecchie** (artifact privati dell'utente; si leggono con lo strumento Artifact). Servono solo come
@@ -17,11 +17,14 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
   prototipo "La posa" https://claude.ai/artifact/EmAnJNbVSZL4S1vYoGRsTX ·
   testi https://claude.ai/artifact/6gQLwvxVkgP78eZmE5bhvb ·
   schermate della prima versione https://claude.ai/artifact/MBtbF8rMkiibHqMq1uv5XL.
-- **Prossimo passo**: l'utente mette online l'anteprima, la guarda da iPhone e da computer e dice cosa cambiare.
+- **Prossimo passo**: l'utente accende GitHub Pages, guarda l'anteprima da iPhone e da computer e dice cosa
+  cambiare. Poi Cloudflare per il sito definitivo.
 - **In attesa dall'utente**:
-  - il via per unire il ramo di lavoro a `main` (serve sia a Cloudflare sia a GitHub Pages);
-  - creare il progetto su Cloudflare oppure accendere GitHub Pages (passi in "Pubblicazione");
+  - accendere GitHub Pages: Settings → Pages → Source → "GitHub Actions". Al 2026-11-16 non era ancora
+    acceso: controllare. Dopo l'accensione serve un giro del flusso su `main` (pulsante "Run workflow" nella
+    scheda Actions, oppure lo avvia Claude con gli strumenti GitHub: flusso `anteprima-github-pages.yml`);
   - commenti sull'anteprima e prova su iPhone;
+  - creare il progetto su Cloudflare (passi in "Pubblicazione") quando vuole pubblicare davvero;
   - il dominio (proposte in "Progetto"): quando c'è, va scritto in `astro.config.mjs`.
 
 ## Progetto
@@ -175,8 +178,9 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 
 - Rispondere in italiano semplice: l'utente non è un tecnico.
 - Prima il piano, poi il lavoro: l'utente vuole approvare le scelte importanti.
-- Tutto il lavoro è sul ramo `claude/vigilant-ptolemy-vvojok` (contiene anche il vecchio
-  `claude/youthful-hamilton-7pq7ob`), non ancora unito a `main`. Niente pull request se non richieste.
+- Il sito si pubblica da `main`: l'anteprima su GitHub Pages (e poi Cloudflare) segue quel ramo. Si lavora su
+  un ramo `claude/...` e si porta su `main` con una pull request solo quando l'utente lo chiede o dà l'ok.
+  I vecchi rami `claude/youthful-hamilton-7pq7ob` e `claude/vigilant-ptolemy-vvojok` sono già dentro `main`.
 - Skill da usare: `frontend-design` per la grafica, `algorithmic-art` per l'animazione da computer.
   L'utente ha installato il plugin Design: `design:accessibility-review` e `design:design-critique` servono
   nelle verifiche della fase 4.
@@ -213,3 +217,5 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   Esito: 90 aperture di pagina senza errori né link rotti (3 varianti, 3 larghezze), axe-core senza
   violazioni, home su telefono lento: elemento principale visibile in 0,7 s, 199 KB. Lighthouse in questa
   sessione è stato negato dal controllo dei permessi: la velocità è misurata con Playwright.
+- 2026-11-16: con l'ok dell'utente il lavoro è stato unito a `main` (pull request #1). L'utente sceglie GitHub
+  Pages per la prima anteprima; Cloudflare resta la scelta per il sito definitivo.
