@@ -6,7 +6,7 @@ name: Anteprima su GitHub Pages
 
 on:
   push:
-    branches: [main, claude/vigilant-ptolemy-vvojok] # il secondo ramo è una prova temporanea
+    branches: [main]
   workflow_dispatch:
 
 permissions:
