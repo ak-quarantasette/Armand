@@ -6,21 +6,21 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 
 ## Stato (aggiornato 2026-11-16)
 
-- **Fase in corso**: 1 di 5, anteprima visiva. Seconda bozza pubblicata; confermati caratteri A e marchio 1.
-  Mancano tre scelte (vedi sotto), poi si passa alla fase 2.
+- **Fase in corso**: 2 di 5, testi. Prima bozza pubblicata, in attesa delle correzioni dell'utente.
+  La fase 1 è chiusa: caratteri A, marchio 1, logo in alto a destra con i colori attenuati, apertura a mattoni.
 - **Anteprime** (artifact privati dell'utente, fuori dalla repo; si leggono con lo strumento Artifact):
   - grafica: https://claude.ai/artifact/8Fb5WGHMtMJ6gDYfgVgBQq (primo schermo con il logo dell'azienda in
     alto e nel piede, scelte confermate, animazione telefono "Il tetto");
   - animazione computer "La posa": https://claude.ai/artifact/EmAnJNbVSZL4S1vYoGRsTX (p5.js, con parametri;
-    forme: rombi, quadrati, mattoni).
-- **Prossimo passo**: ricevute le scelte, fase 2 (struttura e testi di tutte le pagine).
+    forme: mattoni fotografici, rombi, quadrati);
+  - testi: https://claude.ai/artifact/6gQLwvxVkgP78eZmE5bhvb (tutte le pagine, con sette punti da confermare).
+- **Prossimo passo**: recepire le correzioni ai testi, poi fase 3 (costruzione del sito con Astro).
 - **In attesa dall'utente**:
-  - posizione del logo dell'azienda nell'intestazione (a destra, come ha chiesto, oppure a sinistra);
-  - colori del logo (originali oppure attenuati: solo verdi più spenti e nero che diventa antracite);
-  - apertura da computer: mattoni, rombi o quadrati;
-  - se i dati legali si possono salvare nella repo pubblica (vedi "Riservatezza");
-  - zone servite, quale dei due numeri usa WhatsApp, due righe sull'azienda;
-  - per ogni foto: che lavoro è e in quale comune.
+  - correzioni ai testi e conferma dei sette punti dati per buoni (elenco in cima alla pagina dei testi:
+    preventivo gratuito, referente unico, comuni serviti, elenchi dei lavori, artigiani e tecnico, didascalie
+    delle foto, privacy da far verificare);
+  - quale dei due numeri usa WhatsApp;
+  - se i dati legali si possono salvare nella repo pubblica (vedi "Riservatezza").
 
 ## Progetto
 
@@ -50,12 +50,16 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
   Si usa nelle due aperture, nel piede e come icona del sito.
 - **Logo dell'azienda**: l'utente vuole vederlo di più. Va nell'intestazione come link alla Home e nel piede
   su una targhetta bianca. È ricalcato in vettoriale in `materiali/logo/` (da alleggerire con SVGO in fase 3).
-  Se stona si possono cambiare i colori, ma solo il minimo.
+  Scelta dell'utente: in alto a destra, con i colori attenuati (`logo-attenuato.svg`: cambiano solo i verdi,
+  più spenti, e il nero che diventa antracite).
 - **Foto**: poche e al massimo 1440 px di lato. Mai a tutto schermo su computer: in cornici dove restano nitide.
 - **Struttura**: Home, una pagina per ciascuno dei 4 servizi, Lavori, Chi siamo, Contatti, Privacy/Note legali.
   Home: apertura, prima/dopo della facciata, servizi, lavori, come lavoriamo, zone servite, contatti.
 - **SEO**: testi scritti da Claude per le ricerche locali, dati strutturati di attività locale, sitemap,
   titoli e descrizioni per pagina. Niente recensioni inventate. Poi Google Business Profile e Search Console.
+- **Testi**: li scrive Claude con le frasi tipiche di un'impresa edile, come ha chiesto l'utente; si può
+  scrivere "dal 2017". Stanno in `contenuti/` (Markdown con titolo e descrizione per Google); contatti e dati
+  legali sono segnaposto `{{...}}`. Niente numeri, certificazioni o recensioni inventati.
 - **Tecnica**: sito statico con Astro, quasi zero JavaScript, immagini AVIF/WebP, obiettivo Lighthouse
   mobile almeno 95. Hosting statico gratuito (Cloudflare o GitHub Pages), da decidere alla pubblicazione.
 
@@ -67,9 +71,12 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - **Computer, "La posa"** (interattiva, 5-8 secondi): parete di tessere dal lato grezzo (pietra grigia
   generata dal codice, tipo ceppo di Gré); passando il cursore le tessere si girano e mostrano il lato
   finito, intonaco bianco con il nuovo marchio. Senza movimento parte un'onda automatica. Alla fine la
-  parete diventa lo sfondo della pagina. Forme: rombi e quadrati (si girano) oppure mattoni, chiesti
-  dall'utente al posto dei listelli: il muro si costruisce corso per corso, i mattoni colpiti si crepano,
-  si staccano e cadono con la polvere, quelli senza appoggio li seguono, e dietro resta la parete finita.
+  parete diventa lo sfondo della pagina. Scelta dell'utente: i mattoni, al posto delle tessere che si girano.
+  Il muro si costruisce corso per corso, i mattoni colpiti si crepano, si staccano e cadono con la polvere,
+  quelli senza appoggio li seguono, e dietro resta la parete finita. Il muro è una foto vera (Poly Haven
+  `brick_wall_006`, licenza CC0) con la luce cotta dalla mappa delle normali: l'utente lo vuole "come dal vivo".
+  In `materiali/muro/` ci sono la foto, le sagome dei mattoni e le 405 celle
+  `[x, y, larghezza, altezza, corso dal basso]` in pixel su 2048x1152.
   Prototipo con la skill `algorithmic-art` (p5.js); in produzione va riscritta in canvas leggero senza librerie.
   Va attivata solo con `(hover: hover) and (pointer: fine)`.
 - **Telefono, "Il tetto"** (automatica, circa 2 secondi): il monogramma si disegna con un tratto solo,
@@ -102,6 +109,8 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   soggiorno, cucina-soggiorno, sala da pranzo, scala in legno. In corso d'opera: doccia in muratura,
   massetto, stanza in cantiere. Sono già leggere: il sito ne genera versioni AVIF/WebP per ogni schermo.
 - `materiali/logo/`: logo dell'azienda in SVG (colori originali e attenuati) e monogramma "Tetti".
+- `materiali/muro/`: foto del muro di mattoni, sagome e celle per l'apertura da computer.
+- `contenuti/`: testi delle 9 pagine (home, 4 servizi, lavori, chi siamo, contatti, note legali).
 
 ## Regole di lavoro
 
@@ -127,3 +136,6 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - 2026-11-16: l'utente conferma caratteri A e marchio 1, carica 7 foto e chiede più presenza del suo logo e i
   mattoni nell'apertura. Fatti: logo ricalcato in vettoriale, seconda bozza dell'anteprima, modalità mattoni
   nel prototipo.
+- 2026-11-16: l'utente sceglie logo a destra, colori attenuati e mattoni, chiede un muro realistico e dice di
+  scrivere i testi con buone frasi da impresa edile. Fatti: muro da foto vera nel prototipo, terza bozza
+  dell'anteprima, prima bozza dei testi in `contenuti/` e nella pagina di lettura.
