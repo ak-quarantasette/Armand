@@ -2,7 +2,7 @@
 
 Claude legge questo file a inizio sessione: contiene tutto il contesto, quindi non serve rileggere altro.
 Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
-**La repo è pubblica: qui dentro niente dati personali.**
+
 
 ## Stato (aggiornato 2026-11-16)
 
