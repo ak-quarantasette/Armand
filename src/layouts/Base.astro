@@ -46,7 +46,7 @@ const scheda = {
     {/* In anteprima (dominio non ancora scritto in astro.config.mjs) nessuna pagina va su Google. */}
     {!sito.anteprima && <link rel="canonical" href={canonico} />}
     {(!indicizza || sito.anteprima) && <meta name="robots" content="noindex" />}
-    <meta name="theme-color" content="#F3F5F6" />
+    <meta name="theme-color" content="#F1F5F8" />
     <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="it_IT" />
@@ -58,18 +58,44 @@ const scheda = {
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(scheda)} />
     <script is:inline>
-      // Colori che cambiano scorrendo: scrive in --caldo quanto si è scesi nella pagina (0 in cima, 1 in fondo).
-      // global.css usa quel numero per passare dai toni freddi a quelli caldi.
+      // Colori che cambiano scorrendo. Quattro toni, uno per tappa della guida, dal bianco freddo al caldo:
+      // il colore resta fermo dentro una tappa e passa al successivo attorno al punto in cui la guida cambia
+      // tappa (a 1/6, a metà e a 5/6 del percorso). Sulla home il percorso è il blocco ".racconto", lo stesso
+      // che muove la guida; nelle altre pagine è tutta la pagina. Per ritoccare i toni si cambia la tabella.
       (function () {
         var d = document.documentElement, attesa = false;
+        //            sfondo     superfici  fasce      filetti    testi secondari
+        var toni = [['F1F5F8', 'F9FBFC', 'E3EAEF', 'C5CFD6', '525A61'],   // Sopralluogo: bianco freddo
+                    ['F6F2EA', 'FCFAF5', 'EBE5D8', 'D6CEBE', '57564E'],   // Preventivo: avorio
+                    ['F0DEC4', 'F7EAD6', 'E6CFAE', 'CDB48E', '54483B'],   // Cantiere: sabbia
+                    ['E7C5A3', 'EFD3B6', 'DFB892', 'C09770', '4C3C2F']];  // Consegna: terra chiara
+        var nomi = ['--calce', '--calce-2', '--calce-3', '--linea', '--pietra'];
+        var confini = [1 / 6, 1 / 2, 5 / 6], mezza = 0.06, ultimo = '';
+        function n(h, k) { return parseInt(h.substr(k * 2, 2), 16); }
         function aggiorna() {
           attesa = false;
-          var corsa = d.scrollHeight - innerHeight;
-          d.style.setProperty('--caldo', corsa > 0 ? Math.min(1, Math.max(0, scrollY / corsa)).toFixed(3) : '0');
+          var r = document.querySelector('.racconto'), t;
+          if (r) { var q = r.getBoundingClientRect(); t = -q.top / Math.max(1, q.height - innerHeight); }
+          else { t = scrollY / Math.max(1, d.scrollHeight - innerHeight); }
+          t = Math.min(1, Math.max(0, t));
+          var fase = 0;
+          for (var i = 0; i < 3; i++) {
+            var x = Math.min(1, Math.max(0, (t - (confini[i] - mezza)) / (2 * mezza)));
+            fase += x * x * (3 - 2 * x); // passaggio morbido attorno al confine
+          }
+          var a = Math.min(2, Math.floor(fase)), m = fase - a, chiave = fase.toFixed(3);
+          if (chiave === ultimo) return;
+          ultimo = chiave;
+          for (var c = 0; c < nomi.length; c++) {
+            var da = toni[a][c], verso = toni[a + 1][c], rgb = [];
+            for (var k = 0; k < 3; k++) rgb.push(Math.round(n(da, k) + (n(verso, k) - n(da, k)) * m));
+            d.style.setProperty(nomi[c], 'rgb(' + rgb.join(',') + ')');
+          }
         }
         function chiedi() { if (!attesa) { attesa = true; requestAnimationFrame(aggiorna); } }
         addEventListener('scroll', chiedi, { passive: true });
         addEventListener('resize', chiedi, { passive: true });
+        addEventListener('DOMContentLoaded', chiedi);
         addEventListener('load', chiedi);
       })();
     </script>
