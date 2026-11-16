@@ -75,7 +75,7 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 ## Animazioni d'apertura
 
 Regole comuni: una volta per visita, sempre saltabili, contenuto vero già caricato sotto,
-dissolvenza semplice se l'utente ha "riduci animazioni".
+nessuna apertura se l'utente ha "riduci animazioni".
 
 - **Computer, "La posa"** (interattiva, 5-8 secondi): parete di tessere dal lato grezzo (pietra grigia
   generata dal codice, tipo ceppo di Gré); passando il cursore le tessere si girano e mostrano il lato
@@ -91,8 +91,12 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   chiesto l'effetto "doppio fondo". Parte solo con `(hover: hover) and (pointer: fine)` e schermo da 900 px in su.
   Durata misurata: 7-8 secondi se nessuno tocca nulla (dopo 3 secondi di muro finito crolla da solo); finché il
   visitatore gioca col mouse va avanti, al massimo 7,5 secondi di gioco. Clic, tasto o rotella: crolla subito.
-- **Telefono** (automatica, circa 2 secondi): compare il logo dell'azienda, poi la schermata si apre a
-  lamelle orizzontali. Solo CSS. Anche su computer dietro il muro c'è il logo dell'azienda.
+- **Telefono**: compare il logo dell'azienda. Anche su computer dietro il muro c'è il logo.
+- **Ingresso nel sito (richiesta dell'utente)**: finita l'apertura la schermata con il logo resta ferma e si
+  entra scorrendo: segue la rotella o il dito e sale via come un sipario (oltre il 18% entra, altrimenti
+  torna giù). A lato c'è la scritta "Scorri", che è anche un pulsante; vanno bene anche freccia giù, spazio
+  e Invio. Niente più dissolvenza né lamelle. La logica è nello script in testa a `Base.astro`
+  (`window.amPronta` la chiama il muro quando ha finito), gli stili in `Apertura.astro`.
 
 ## Scorrimento (com'è fatto)
 
@@ -109,12 +113,13 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   movimento sparisce senza errori. Usare le proprietà lunghe (`animation-name`, ...), come in `Guida.astro`.
   Le animazioni vanno sempre controllate sul sito costruito, in movimento, non su schermate ferme.
 - **Colori che cambiano scorrendo** (richiesta dell'utente, "come il riferimento"): quattro toni, uno per
-  tappa della guida, dal bianco freddo al caldo (bianco freddo, avorio, sabbia, terra chiara). Il colore
-  resta fermo dentro una tappa e cambia quando la guida passa alla tappa dopo (a 1/6, metà e 5/6 del
-  percorso). Lo fa lo script in testa a `Base.astro`, che ha la tabella dei toni e aggiorna `--calce`,
-  `--calce-2`, `--calce-3`, `--linea` e `--pietra`. Sulla home segue il blocco `.racconto`, nelle altre
-  pagine tutta la pagina. Una prima versione con sfumatura lieve e continua non è piaciuta: il cambio deve
-  notarsi a ogni tappa. Se si cambiano i toni, ricontrollare il contrasto dei testi sull'ultimo.
+  tappa della guida, dal bianco freddo al caldo (bianco freddo, avorio, sabbia, terra chiara). Lo sfondo
+  sfuma in modo continuo: è il tono della tappa quando il segno della guida ci arriva sopra, nel mezzo è la
+  miscela dei due vicini. Lo fa lo script in testa a `Base.astro`, che ha la tabella dei toni e aggiorna
+  `--calce`, `--calce-2`, `--calce-3`, `--linea` e `--pietra`. Sulla home segue il blocco `.racconto`, nelle
+  altre pagine tutta la pagina. Anche le fasce `.fascia` entrano ed escono sfumando, senza bordi.
+  Storia: una sfumatura troppo lieve non si notava; un cambio a scatti sulle tappe era "troppo netto".
+  Va bene così: toni ben distinti ma passaggio sfumato. Se si cambiano i toni, ricontrollare il contrasto.
 
 ## Pubblicazione
 
@@ -246,3 +251,5 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   nella pagina Coperture e in home. Didascalie scritte guardando le foto: da far confermare.
 - 2026-11-16: l'utente approva logo e foto ma vuole il cambio di colore più evidente, a tappe come nel
   riferimento. Fatto: quattro toni legati alle tappe della guida.
+- 2026-11-16: l'utente chiede lo sfondo sfumato e non netto, e di entrare nel sito scorrendo dopo l'apertura,
+  con la scritta "Scorri" a lato, anche su telefono. Fatti entrambi.

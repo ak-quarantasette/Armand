@@ -58,10 +58,11 @@ const scheda = {
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(scheda)} />
     <script is:inline>
-      // Colori che cambiano scorrendo. Quattro toni, uno per tappa della guida, dal bianco freddo al caldo:
-      // il colore resta fermo dentro una tappa e passa al successivo attorno al punto in cui la guida cambia
-      // tappa (a 1/6, a metà e a 5/6 del percorso). Sulla home il percorso è il blocco ".racconto", lo stesso
-      // che muove la guida; nelle altre pagine è tutta la pagina. Per ritoccare i toni si cambia la tabella.
+      // Colori che cambiano scorrendo. Quattro toni, uno per tappa della guida, dal bianco freddo al caldo.
+      // Il colore sfuma in modo continuo: è esattamente quello della tappa quando il segno della guida ci
+      // arriva sopra (inizio, un terzo, due terzi, fine) e nel mezzo è la miscela dei due vicini.
+      // Sulla home il percorso è il blocco ".racconto", lo stesso che muove la guida; nelle altre pagine è
+      // tutta la pagina. Per ritoccare i toni si cambia la tabella.
       (function () {
         var d = document.documentElement, attesa = false;
         //            sfondo     superfici  fasce      filetti    testi secondari
@@ -70,7 +71,7 @@ const scheda = {
                     ['F0DEC4', 'F7EAD6', 'E6CFAE', 'CDB48E', '54483B'],   // Cantiere: sabbia
                     ['E7C5A3', 'EFD3B6', 'DFB892', 'C09770', '4C3C2F']];  // Consegna: terra chiara
         var nomi = ['--calce', '--calce-2', '--calce-3', '--linea', '--pietra'];
-        var confini = [1 / 6, 1 / 2, 5 / 6], mezza = 0.06, ultimo = '';
+        var ultimo = '';
         function n(h, k) { return parseInt(h.substr(k * 2, 2), 16); }
         function aggiorna() {
           attesa = false;
@@ -78,12 +79,7 @@ const scheda = {
           if (r) { var q = r.getBoundingClientRect(); t = -q.top / Math.max(1, q.height - innerHeight); }
           else { t = scrollY / Math.max(1, d.scrollHeight - innerHeight); }
           t = Math.min(1, Math.max(0, t));
-          var fase = 0;
-          for (var i = 0; i < 3; i++) {
-            var x = Math.min(1, Math.max(0, (t - (confini[i] - mezza)) / (2 * mezza)));
-            fase += x * x * (3 - 2 * x); // passaggio morbido attorno al confine
-          }
-          var a = Math.min(2, Math.floor(fase)), m = fase - a, chiave = fase.toFixed(3);
+          var fase = t * 3, a = Math.min(2, Math.floor(fase)), m = fase - a, chiave = fase.toFixed(3);
           if (chiave === ultimo) return;
           ultimo = chiave;
           for (var c = 0; c < nomi.length; c++) {
@@ -124,8 +120,10 @@ const scheda = {
       })();
     </script>
     <script is:inline>
-      // Decide subito, prima che la pagina compaia, se mostrare l'apertura: una volta per visita,
-      // mai se l'utente ha chiesto meno movimento. Su computer (mouse) parte il muro di mattoni.
+      // Apertura: decide subito, prima che la pagina compaia, se mostrarla. Una volta per visita, mai se
+      // l'utente ha chiesto meno movimento. Su computer (mouse) parte il muro di mattoni; su telefono compare
+      // il logo. Poi la schermata con il logo resta ferma e SI ENTRA NEL SITO SCORRENDO: la schermata segue
+      // la rotella o il dito e sale via come un sipario. Vanno bene anche un tasto o un tocco.
       (function () {
         try {
           var d = document.documentElement, s = sessionStorage;
@@ -133,12 +131,67 @@ const scheda = {
           s.setItem('am-apertura', '1');
           var pc = matchMedia('(hover: hover) and (pointer: fine)').matches && innerWidth >= 900;
           d.classList.add('apertura', pc ? 'apertura-pc' : 'apertura-tel');
-          var togli = function () { d.classList.remove('apertura', 'apertura-pc', 'apertura-tel', 'apertura-apri'); };
-          if (!pc) { setTimeout(togli, 2700); return; }
-          // se il muro non parte entro 4 secondi si apre comunque; in ogni caso mai oltre 16
-          setTimeout(function () { if (!window.amMuroPartito && d.classList.contains('apertura-pc')) { d.classList.add('apertura-apri'); setTimeout(togli, 1000); } }, 4000);
-          setTimeout(togli, 16000);
-        } catch (e) {}
+
+          var pronta = false, dal = 0, salita = 0, y0 = null, molla = 0, finita = false;
+          var velo = function () { return document.querySelector('.velo'); };
+          var sposta = function (animata) {
+            var v = velo(); if (!v) return;
+            v.style.transition = animata ? 'transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1)' : 'none';
+            v.style.transform = 'translate3d(0,' + -salita + 'px,0)';
+          };
+          var entra = function () {
+            if (finita) return; finita = true;
+            salita = innerHeight * 1.05; sposta(true);
+            setTimeout(function () {
+              d.classList.remove('apertura', 'apertura-pc', 'apertura-tel', 'apertura-pronta');
+              removeEventListener('wheel', rotella); removeEventListener('keydown', tasto);
+              removeEventListener('touchstart', tocco); removeEventListener('touchmove', dito); removeEventListener('touchend', lascia);
+            }, 720);
+          };
+          var lascia = function () {
+            y0 = null;
+            if (finita || !pronta) return;
+            if (salita > innerHeight * 0.18) entra(); else { salita = 0; sposta(true); }
+          };
+          var attiva = function () { return pronta && !finita && Date.now() - dal > 500; };
+          var rotella = function (e) {
+            if (!d.classList.contains('apertura')) return;
+            e.preventDefault();
+            if (!attiva()) return;
+            salita = Math.max(0, salita + e.deltaY * (e.deltaMode === 1 ? 32 : 1)); sposta(false);
+            clearTimeout(molla); molla = setTimeout(lascia, 160);
+            if (salita > innerHeight * 0.5) entra();
+          };
+          var tocco = function (e) { if (attiva()) y0 = e.touches[0].clientY + salita; };
+          var dito = function (e) {
+            if (!d.classList.contains('apertura')) return;
+            e.preventDefault();
+            if (y0 === null || !attiva()) return;
+            salita = Math.max(0, y0 - e.touches[0].clientY); sposta(false);
+          };
+          var tasto = function (e) {
+            if (attiva() && /^(ArrowDown|PageDown| |Spacebar|Enter|End|Escape)$/.test(e.key)) { e.preventDefault(); entra(); }
+          };
+          addEventListener('wheel', rotella, { passive: false });
+          addEventListener('touchstart', tocco, { passive: true });
+          addEventListener('touchmove', dito, { passive: false });
+          addEventListener('touchend', lascia);
+          addEventListener('keydown', tasto);
+          // la scritta "Scorri" è un pulsante: un clic o un tocco lì fa entrare lo stesso
+          addEventListener('click', function (e) { if (attiva() && e.target.closest && e.target.closest('.velo .indizio')) entra(); });
+
+          // Da questo momento si può entrare. Lo chiama il muro quando ha finito (Apertura.astro).
+          window.amPronta = function () {
+            if (pronta) return; pronta = true; dal = Date.now();
+            d.classList.add('apertura-pronta');
+          };
+          if (!pc) setTimeout(window.amPronta, 1300);
+          // su computer: se il muro non parte entro 4 secondi, o comunque dopo 16, si può entrare lo stesso
+          else {
+            setTimeout(function () { if (!window.amMuroPartito) window.amPronta(); }, 4000);
+            setTimeout(window.amPronta, 16000);
+          }
+        } catch (e) { document.documentElement.classList.remove('apertura', 'apertura-pc', 'apertura-tel'); }
       })();
     </script>
   </head>

@@ -1,54 +1,47 @@
 ---
-// Apertura animata, una sola volta per visita (lo decide lo script in testa alla pagina).
-// Telefono: compare il logo dell'azienda, poi la schermata si apre a lamelle. Solo CSS.
-// Computer: sopra lo stesso schermo si costruisce un muro di mattoni che il cursore fa crollare,
-// e dietro resta il logo.
+// Apertura animata, una sola volta per visita (lo decide lo script in testa alla pagina, in Base.astro).
+// Telefono: compare il logo dell'azienda. Computer: un muro di mattoni si costruisce e il cursore lo fa
+// crollare, e dietro resta il logo. Poi la schermata resta ferma e si entra nel sito scorrendo: sale via
+// come un sipario seguendo la rotella o il dito. A lato c'è la scritta "Scorri".
 import logoUrl from '../assets/logo-azienda.svg?url';
 ---
 <div class="velo" aria-hidden="true">
-  <div class="lamelle">{Array.from({ length: 12 }, (_, i) => <i style={`--i:${i}`}></i>)}</div>
   <div class="segno">
     <img src={logoUrl} width="392" height="207" alt="" />
   </div>
   <canvas class="muro"></canvas>
+  <button class="indizio" type="button" tabindex="-1"><span>Scorri</span><i></i></button>
 </div>
 
 <script>
   const d = document.documentElement;
   if (d.classList.contains('apertura-pc')) {
-    const chiudi = () => {
-      d.classList.add('apertura-apri');
-      setTimeout(() => d.classList.remove('apertura', 'apertura-pc', 'apertura-apri'), 1000);
-    };
+    const pronta = () => (window as any).amPronta?.();
     const tela = document.querySelector<HTMLCanvasElement>('.velo .muro');
-    import('../scripts/muro.js')
-      .then((m) => m.avvia(tela))
-      .then((fatto) => { if (fatto || d.classList.contains('apertura-pc')) chiudi(); }, chiudi);
+    import('../scripts/muro.js').then((m) => m.avvia(tela)).then(pronta, pronta);
   }
 </script>
 
 <style is:global>
   .velo { display: none; }
-  html.apertura .velo { display: block; position: fixed; inset: 0; z-index: 100; perspective: 900px; }
-  html.apertura-tel .velo { pointer-events: none; }
-  html.apertura-pc { overflow: hidden; }
+  html.apertura { overflow: hidden; }
+  html.apertura body { overflow: hidden; touch-action: none; }
+  html.apertura .velo { display: block; position: fixed; inset: 0; z-index: 100; background: var(--calce); box-shadow: 0 30px 60px -20px rgba(31, 35, 39, 0.35); will-change: transform; touch-action: none; }
 
-  .velo .lamelle { position: absolute; inset: 0; display: grid; grid-template-rows: repeat(12, 1fr); }
-  .velo .lamelle i { background: var(--calce); box-shadow: 0 0 0 1px var(--calce); transform-origin: 50% 0; }
-  .velo .segno { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: clamp(14px, 2vw, 26px); color: var(--antracite); }
+  .velo .segno { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; }
   .velo .segno img { width: clamp(200px, 30vw, 420px); height: auto; }
-  .velo .muro { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .velo .muro { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
   /* il logo compare salendo appena */
   html.apertura .velo .segno img { animation: ap-sali 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both; }
 
-  /* uscita: le lamelle si aprono e il marchio svanisce. Su telefono parte da sola. */
-  html.apertura-tel .velo .lamelle i { animation: ap-lamella 0.44s cubic-bezier(0.6, 0, 0.3, 1) both; animation-delay: calc(1.55s + var(--i) * 0.035s); }
-  html.apertura-tel .velo .segno { animation: ap-via 0.3s linear 1.5s both; }
-  html.apertura-apri .velo .lamelle i { animation: ap-lamella 0.44s cubic-bezier(0.6, 0, 0.3, 1) both; animation-delay: calc(0.12s + var(--i) * 0.035s); }
-  html.apertura-apri .velo .segno { animation: ap-via 0.3s linear both; }
+  /* "Scorri", a lato in basso: compare quando si può entrare; il filo sotto la scritta scende a ripetizione */
+  .velo .indizio { position: absolute; right: clamp(18px, 3.2vw, 44px); bottom: clamp(84px, 12vh, 120px); display: grid; justify-items: center; gap: 12px; padding: 10px; border: 0; background: none; color: var(--antracite); font: 500 0.78rem/1 var(--ft); letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; opacity: 0; transition: opacity 0.6s; }
+  .velo .indizio span { writing-mode: vertical-rl; }
+  .velo .indizio i { position: relative; width: 1px; height: 56px; background: var(--linea); overflow: hidden; }
+  .velo .indizio i::after { content: ''; position: absolute; left: 0; top: 0; width: 1px; height: 22px; background: var(--blu); animation: ap-filo 1.6s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
+  html.apertura-pronta .velo .indizio { opacity: 1; }
 
   @keyframes ap-sali { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-  @keyframes ap-lamella { from { transform: rotateX(0deg); opacity: 1; } to { transform: rotateX(89deg); opacity: 0; } }
-  @keyframes ap-via { to { opacity: 0; } }
+  @keyframes ap-filo { from { transform: translateY(-24px); } to { transform: translateY(58px); } }
 </style>
