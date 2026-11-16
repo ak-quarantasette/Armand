@@ -7,8 +7,8 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 ## Stato (aggiornato 2026-11-16)
 
 - **Fase in corso**: fasi 1-3 chiuse. Fase 4 (verifiche) fatta con Chromium su telefono, tablet e computer;
-  manca solo la prova su iPhone, che fa l'utente. Fase 5 (pubblicazione) avviata: il sito è su `main`
-  (pull request #1, unita con l'ok dell'utente) e l'utente ha scelto GitHub Pages per la prima anteprima.
+  manca solo la prova su iPhone, che fa l'utente. Fase 5 (pubblicazione) avviata: il sito è su `main` e
+  l'anteprima è su GitHub Pages, https://ak-quarantasette.github.io/Armand/ (vedi "Pubblicazione").
 - **Scelte già confermate**: caratteri A, marchio 1, logo in alto a destra con i colori attenuati, apertura a
   mattoni con ombra e spessore, testi approvati (si parla solo di "consulenza gratuita").
 - **Anteprime vecchie** (artifact privati dell'utente; si leggono con lo strumento Artifact). Servono solo come
@@ -17,12 +17,9 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
   prototipo "La posa" https://claude.ai/artifact/EmAnJNbVSZL4S1vYoGRsTX ·
   testi https://claude.ai/artifact/6gQLwvxVkgP78eZmE5bhvb ·
   schermate della prima versione https://claude.ai/artifact/MBtbF8rMkiibHqMq1uv5XL.
-- **Prossimo passo**: l'utente accende GitHub Pages, guarda l'anteprima da iPhone e da computer e dice cosa
-  cambiare. Poi Cloudflare per il sito definitivo.
+- **Prossimo passo**: l'utente guarda l'anteprima da iPhone e da computer e dice cosa cambiare. Poi Cloudflare
+  per il sito definitivo.
 - **In attesa dall'utente**:
-  - accendere GitHub Pages: Settings → Pages → Source → "GitHub Actions". Al 2026-11-16 non era ancora
-    acceso: controllare. Dopo l'accensione serve un giro del flusso su `main` (pulsante "Run workflow" nella
-    scheda Actions, oppure lo avvia Claude con gli strumenti GitHub: flusso `anteprima-github-pages.yml`);
   - commenti sull'anteprima e prova su iPhone;
   - creare il progetto su Cloudflare (passi in "Pubblicazione") quando vuole pubblicare davvero;
   - il dominio (proposte in "Progetto"): quando c'è, va scritto in `astro.config.mjs`.
@@ -121,10 +118,19 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   `workers.dev` e `pages.dev` fuori da Google e dà memoria lunga ai file in `/_astro/`. Per il dominio vero i
   nameserver devono essere quelli di Cloudflare. Se un giorno l'indirizzo `workers.dev` diventasse quello
   definitivo, va tolta la sua regola da `_headers`.
-- **GitHub Pages** (anteprima senza nuovi account): `.github/workflows/anteprima-github-pages.yml` costruisce
-  il sito nella sottocartella `/Armand/` e lo pubblica da `main` su https://ak-quarantasette.github.io/Armand/
-  solo se Pages è acceso con sorgente "GitHub Actions" (Settings → Pages); altrimenti controlla soltanto che il
-  sito si costruisca. Provato sui server di GitHub: costruzione riuscita in circa un minuto.
+- **GitHub Pages** (anteprima, https://ak-quarantasette.github.io/Armand/): l'utente l'ha acceso come nei suoi
+  altri siti, cioè "Deploy from a branch" → `main` → `/ (root)`. In quella modalità GitHub pubblica i file
+  della repo così come sono (il sorgente Astro da solo faceva fallire la costruzione), quindi su `main` ci
+  sono anche le pagine pronte: `anteprima/` (sito costruito con base `/Armand/anteprima`), `index.html` e
+  `404.html` alla radice (copie di quelli in `anteprima/`) e `.nojekyll`. Sono file generati: non si toccano
+  a mano e non serve rifarli nelle pull request. Li rifà `.github/workflows/anteprima-github-pages.yml` a
+  ogni modifica di `main`: costruisce, salva su `main` come `github-actions[bot]` e chiede a Pages di
+  ripubblicare. Dopo un'unione l'anteprima si aggiorna quindi in due o tre minuti, e `main` riceve un
+  salvataggio in più: ripartire sempre da `main` aggiornato. Per rifarli a mano:
+  `SITO_BASE=/Armand/anteprima ANTEPRIMA_URL=https://ak-quarantasette.github.io npm run build`, poi copiare
+  `dist/` in `anteprima/` e i due file alla radice. Non cambiare l'impostazione di Pages in "GitHub Actions":
+  il flusso non pubblica in quel modo. Quando il sito sarà su Cloudflare questa anteprima si può spegnere e
+  si possono cancellare `anteprima/`, `index.html`, `404.html`, `.nojekyll` e il flusso.
 - **Quando arriva il dominio**: scriverlo in `DOMINIO`, collegarlo su Cloudflare, poi Search Console, scheda
   Google Business Profile e cancellazione della vecchia pagina Jimdo.
 
@@ -180,6 +186,7 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - Prima il piano, poi il lavoro: l'utente vuole approvare le scelte importanti.
 - Il sito si pubblica da `main`: l'anteprima su GitHub Pages (e poi Cloudflare) segue quel ramo. Si lavora su
   un ramo `claude/...` e si porta su `main` con una pull request solo quando l'utente lo chiede o dà l'ok.
+  Le modifiche si fanno in `contenuti/` e `src/`, mai nei file generati (`anteprima/`, `index.html`, `404.html`).
   I vecchi rami `claude/youthful-hamilton-7pq7ob` e `claude/vigilant-ptolemy-vvojok` sono già dentro `main`.
 - Skill da usare: `frontend-design` per la grafica, `algorithmic-art` per l'animazione da computer.
   L'utente ha installato il plugin Design: `design:accessibility-review` e `design:design-critique` servono
@@ -219,3 +226,6 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   sessione è stato negato dal controllo dei permessi: la velocità è misurata con Playwright.
 - 2026-11-16: con l'ok dell'utente il lavoro è stato unito a `main` (pull request #1). L'utente sceglie GitHub
   Pages per la prima anteprima; Cloudflare resta la scelta per il sito definitivo.
+- 2026-11-16: l'utente accende Pages in modalità "Deploy from a branch" e la costruzione di GitHub fallisce
+  sui file `.astro`; chiede di farlo funzionare così, con un index come negli altri suoi siti. Fatti: pagine
+  pronte su `main` (`anteprima/`, `index.html`, `404.html`, `.nojekyll`) e flusso che le aggiorna da solo.

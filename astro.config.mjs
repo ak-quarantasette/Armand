@@ -9,7 +9,7 @@ import sitemap from '@astrojs/sitemap';
 const DOMINIO = '';
 
 // Sottocartella in cui vive il sito. Serve solo per l'anteprima su GitHub Pages
-// (.../Armand/), dove la imposta il flusso in .github/workflows; altrove resta '/'.
+// (.../Armand/anteprima/), dove la imposta il flusso in .github/workflows; altrove resta '/'.
 const base = process.env.SITO_BASE || '/';
 
 export default defineConfig({
