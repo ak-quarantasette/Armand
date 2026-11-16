@@ -1,0 +1,19 @@
+# Intestazioni per Cloudflare. Gli altri servizi ignorano questo file.
+
+# Gli indirizzi provvisori di Cloudflare non devono comparire su Google: ci va solo il dominio vero.
+https://:nome.:account.workers.dev/*
+  X-Robots-Tag: noindex
+
+https://:progetto.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:versione.:progetto.pages.dev/*
+  X-Robots-Tag: noindex
+
+# I file in /_astro/ cambiano nome a ogni modifica: il browser può tenerli in memoria a lungo.
+/_astro/*
+  Cache-Control: public, max-age=31556952, immutable
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
