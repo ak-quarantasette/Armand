@@ -52,14 +52,22 @@ Nella dashboard: **Workers & Pages → Create application → Import a repositor
 Da quel momento ogni modifica del ramo collegato viene pubblicata da sola. Il file `public/_headers` tiene gli
 indirizzi provvisori `workers.dev` fuori da Google e fa tenere in memoria ai browser i file che non cambiano.
 
-### GitHub Pages (anteprima senza nuovi account)
+### GitHub Pages (anteprima)
 
-Il flusso `.github/workflows/anteprima-github-pages.yml` pubblica il ramo `main` su
-`https://ak-quarantasette.github.io/Armand/`. Per accenderlo: **Settings → Pages → Source → GitHub Actions**.
-Finché Pages è spento il flusso si limita a controllare che il sito si costruisca.
+L'anteprima è su `https://ak-quarantasette.github.io/Armand/`. GitHub Pages è impostato su
+**Deploy from a branch → main → / (root)**: pubblica i file della repo così come sono, quindi qui dentro ci
+sono anche le pagine già pronte.
 
-Su GitHub Pages il sito vive nella sottocartella `/Armand/`: per questo tutti i link interni passano dalla
-funzione `u()` di `src/lib/percorsi.ts`. Un link scritto a mano con `/pagina/` lì non funzionerebbe.
+- `anteprima/`: il sito costruito.
+- `index.html` e `404.html` nella cartella principale: copie della home e della pagina di errore.
+- `.nojekyll`: dice a GitHub di non rielaborare i file.
+
+Sono file generati e non vanno modificati a mano: a ogni modifica di `main` il flusso
+`.github/workflows/anteprima-github-pages.yml` ricostruisce il sito, li aggiorna e li salva. Le pagine da
+modificare restano quelle in `contenuti/` e `src/`.
+
+Nell'anteprima il sito vive nella sottocartella `/Armand/anteprima/`: per questo tutti i link interni passano
+dalla funzione `u()` di `src/lib/percorsi.ts`. Un link scritto a mano con `/pagina/` lì non funzionerebbe.
 
 ## Cartelle
 
@@ -67,5 +75,6 @@ funzione `u()` di `src/lib/percorsi.ts`. Un link scritto a mano con `/pagina/` l
 - `materiali/`: foto e logo originali, logo vettoriale, foto del muro per l'apertura.
 - `src/`: pagine, componenti e stile del sito. I dati dell'azienda sono in `src/data/sito.ts`.
 - `public/`: file serviti così come sono (icona, immagini dell'apertura, intestazioni per Cloudflare).
+- `anteprima/`, `index.html`, `404.html`: pagine pronte per GitHub Pages, generate in automatico.
 
 Il contesto del progetto, le decisioni prese e lo stato dei lavori sono in `CLAUDE.md`.
