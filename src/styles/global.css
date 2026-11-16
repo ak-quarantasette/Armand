@@ -2,23 +2,19 @@
    Impaginazione ariosa da rivista, allineata a sinistra: molto bianco, foto in cornice, filetti sottili.
    I colori vengono dai cantieri (calce, pietra, terra) più il blu e il rosso del logo.
 
-   COLORI CHE CAMBIANO SCORRENDO (richiesta del cliente): la pagina parte bianca e fredda e arriva calda in
-   fondo, in modo continuo. Lo script in testa a Base.astro scrive in --caldo quanto si è scesi (da 0 a 1);
-   qui ogni colore di fondo è una miscela tra la versione fredda e quella calda. Senza JavaScript resta fredda.
-   Per ritoccare i toni basta cambiare le coppie --f-* (freddo) e --c-* (caldo). */
+   COLORI CHE CAMBIANO SCORRENDO (richiesta del cliente, come nel sito di riferimento): la pagina ha quattro
+   toni, uno per tappa della guida (Sopralluogo, Preventivo, Cantiere, Consegna), dal bianco freddo al caldo.
+   Il colore resta fermo dentro una tappa e passa al successivo quando la guida arriva alla tappa nuova.
+   I quattro toni sono scritti nello script in testa a Base.astro, che aggiorna le variabili qui sotto;
+   quelli scritti qui sono il primo tono, usato anche senza JavaScript. */
 
 :root {
-  --caldo: 0;
-  --f-calce: #F3F5F6;  --c-calce: #F5EADB;   /* sfondo */
-  --f-calce-2: #FAFBFC; --c-calce-2: #FBF3E8; /* superfici chiare */
-  --f-calce-3: #E7EBED; --c-calce-3: #EBDBC6; /* fasce appena più scure */
-  --f-linea: #CBD2D6;  --c-linea: #D6C3AB;   /* filetti */
-  --calce: var(--f-calce);
-  --calce-2: var(--f-calce-2);
-  --calce-3: var(--f-calce-3);
-  --linea: var(--f-linea);
+  --calce: #F1F5F8;      /* sfondo */
+  --calce-2: #F9FBFC;    /* superfici chiare */
+  --calce-3: #E3EAEF;    /* fasce appena più scure */
+  --linea: #C5CFD6;      /* filetti */
+  --pietra: #525A61;     /* testi secondari */
   --antracite: #1F2327;  /* testi */
-  --pietra: #555B60;     /* testi secondari */
   --ardesia: #2C241E;    /* fascia scura in fondo alla pagina: bruno caldo */
   --blu: #184898;        /* pulsanti e link */
   --blu-scuro: #123A7C;
@@ -34,16 +30,6 @@
   --testata: 76px;
   --morbido: cubic-bezier(0.22, 0.61, 0.36, 1); /* arrivo lento e morbido */
   color-scheme: light;
-}
-
-@supports (color: color-mix(in oklab, red, blue)) {
-  :root {
-    --quanto: calc(var(--caldo) * 100%);
-    --calce: color-mix(in oklab, var(--f-calce), var(--c-calce) var(--quanto));
-    --calce-2: color-mix(in oklab, var(--f-calce-2), var(--c-calce-2) var(--quanto));
-    --calce-3: color-mix(in oklab, var(--f-calce-3), var(--c-calce-3) var(--quanto));
-    --linea: color-mix(in oklab, var(--f-linea), var(--c-linea) var(--quanto));
-  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }

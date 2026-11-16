@@ -14,8 +14,8 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 - **Scelte cambiate dall'utente il 2026-11-16 (valgono queste, non quelle del piano)**:
   - il marchio nuovo "Tetti" (monogramma AM e scritta) è stato tolto ovunque: resta solo il logo
     dell'azienda, in alto a destra, nel piede, nelle due aperture e come icona;
-  - i colori di fondo passano in modo continuo da bianco freddo in cima a toni caldi in fondo
-    (vedi "Scorrimento"); la fascia scura finale è bruno caldo `#2C241E`, non più ardesia.
+  - i colori di fondo passano da bianco freddo in cima a toni caldi in fondo, cambiando a ogni tappa
+    della guida (vedi "Scorrimento"); la fascia scura finale è bruno caldo `#2C241E`, non più ardesia.
 - **Anteprime vecchie** (artifact privati dell'utente; si leggono con lo strumento Artifact). Servono solo come
   storico, ora fa fede il sito costruito:
   grafica https://claude.ai/artifact/8Fb5WGHMtMJ6gDYfgVgBQq ·
@@ -108,9 +108,13 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   del CSS li fonde in una forma che i browser scartano: in `npm run dev` funziona, nel sito costruito il
   movimento sparisce senza errori. Usare le proprietà lunghe (`animation-name`, ...), come in `Guida.astro`.
   Le animazioni vanno sempre controllate sul sito costruito, in movimento, non su schermate ferme.
-- **Colori che cambiano scorrendo** (richiesta dell'utente): uno script in testa a `Base.astro` scrive in
-  `--caldo` quanto si è scesi (0-1); in `global.css` sfondo, fasce e filetti sono miscele `color-mix` tra le
-  coppie `--f-*` (freddo) e `--c-*` (caldo). Vale per tutte le pagine. Per ritoccare i toni si cambiano le coppie.
+- **Colori che cambiano scorrendo** (richiesta dell'utente, "come il riferimento"): quattro toni, uno per
+  tappa della guida, dal bianco freddo al caldo (bianco freddo, avorio, sabbia, terra chiara). Il colore
+  resta fermo dentro una tappa e cambia quando la guida passa alla tappa dopo (a 1/6, metà e 5/6 del
+  percorso). Lo fa lo script in testa a `Base.astro`, che ha la tabella dei toni e aggiorna `--calce`,
+  `--calce-2`, `--calce-3`, `--linea` e `--pietra`. Sulla home segue il blocco `.racconto`, nelle altre
+  pagine tutta la pagina. Una prima versione con sfumatura lieve e continua non è piaciuta: il cambio deve
+  notarsi a ogni tappa. Se si cambiano i toni, ricontrollare il contrasto dei testi sull'ultimo.
 
 ## Pubblicazione
 
@@ -240,3 +244,5 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - 2026-11-16: l'utente vede l'anteprima e chiede tre modifiche. Fatte: colori dal freddo al caldo lungo la
   pagina, solo il logo dell'azienda (tolto il marchio "Tetti", anche dalle aperture), 16 foto nuove in Lavori,
   nella pagina Coperture e in home. Didascalie scritte guardando le foto: da far confermare.
+- 2026-11-16: l'utente approva logo e foto ma vuole il cambio di colore più evidente, a tappe come nel
+  riferimento. Fatto: quattro toni legati alle tappe della guida.
