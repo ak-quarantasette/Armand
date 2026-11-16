@@ -4,23 +4,24 @@
 import Marchio from './Marchio.astro';
 import logoUrl from '../assets/logo-azienda.svg?url';
 import { menu, sito, telHref } from '../data/sito';
-const tel = telHref(sito.tel1) || '/contatti/';
-const qui = Astro.url.pathname;
+import { u, senzaRadice } from '../lib/percorsi';
+const tel = telHref(sito.tel1) || u('/contatti/');
+const qui = senzaRadice(Astro.url.pathname);
 ---
 <header class="testata">
   <div class="contenitore riga">
-    <a class="segno" href="/" aria-label="A.M. Costruzioni, pagina iniziale"><Marchio /></a>
+    <a class="segno" href={u('/')} aria-label="A.M. Costruzioni, pagina iniziale"><Marchio /></a>
     <nav class="voci" aria-label="Menu principale">
-      {menu.map((v) => <a href={v.href} aria-current={qui === v.href ? 'page' : undefined}>{v.nome}</a>)}
+      {menu.map((v) => <a href={u(v.href)} aria-current={qui === v.href ? 'page' : undefined}>{v.nome}</a>)}
     </nav>
     <a class="b1 chiama" href={tel}>Chiama</a>
-    <a class="logo" href="/" aria-label="Home">
+    <a class="logo" href={u('/')} aria-label="Home">
       <img src={logoUrl} width="106" height="56" alt="Logo A.M. Costruzioni snc" />
     </a>
     <details class="tendina">
       <summary><span></span><span></span><b>Menu</b></summary>
       <nav aria-label="Menu">
-        {menu.map((v) => <a href={v.href}>{v.nome}</a>)}
+        {menu.map((v) => <a href={u(v.href)}>{v.nome}</a>)}
       </nav>
     </details>
   </div>

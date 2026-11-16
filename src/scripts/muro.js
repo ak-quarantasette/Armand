@@ -4,6 +4,8 @@
 // Foto: Poly Haven "brick_wall_006", licenza CC0. Le celle dicono dov'è ogni mattone nella foto.
 import dati from '../../materiali/muro/celle.json';
 
+const radice = import.meta.env.BASE_URL.replace(/\/$/, ''); // sottocartella del sito, se c'è
+
 const carica = (src) =>
   new Promise((res) => {
     const im = new Image();
@@ -22,7 +24,7 @@ export async function avvia(canvas) {
   const W = Math.round(vw * dpr), H = Math.round(vh * dpr);
 
   const [foto, sagome] = await Promise.race([
-    Promise.all([carica(W > 1700 ? '/apertura/muro.webp' : '/apertura/muro-1600.webp'), carica('/apertura/muro-sagome.webp')]),
+    Promise.all([carica(radice + (W > 1700 ? '/apertura/muro.webp' : '/apertura/muro-1600.webp')), carica(radice + '/apertura/muro-sagome.webp')]),
     new Promise((res) => setTimeout(() => res([null, null]), 3500)),
   ]);
   if (!foto || !sagome || !html.classList.contains('apertura-pc')) return false;

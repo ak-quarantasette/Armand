@@ -6,6 +6,7 @@ import Blocchi from '../components/Blocchi.astro';
 import Foto from '../components/Foto.astro';
 import { pagina } from '../lib/testi';
 import { servizi } from '../data/sito';
+import { u } from '../lib/percorsi';
 
 export function getStaticPaths() {
   return servizi.map((s) => ({ params: { servizio: s.slug }, props: { file: s.file } }));
@@ -25,7 +26,7 @@ const altri = servizi.filter((s) => s.slug !== Astro.params.servizio);
 ---
 <Base titolo={p.titolo} descrizione={p.descrizione}>
   <section class="contenitore cima">
-    <p class="tenue briciole"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/#servizi">Servizi</a></p>
+    <p class="tenue briciole"><a href={u('/')}>Home</a> <span aria-hidden="true">/</span> <a href={u('/#servizi')}>Servizi</a></p>
     <h1>{p.h1}</h1>
     <div class="grande-intro"><Blocchi blocchi={p.intro} /></div>
   </section>
@@ -64,7 +65,7 @@ const altri = servizi.filter((s) => s.slug !== Astro.params.servizio);
     <div class="contenitore">
       <h2>Gli altri servizi</h2>
       <ul class="altri">
-        {altri.map((s) => <li><a href={`/${s.slug}/`}>{s.nome}</a></li>)}
+        {altri.map((s) => <li><a href={u(`/${s.slug}/`)}>{s.nome}</a></li>)}
       </ul>
     </div>
   </section>

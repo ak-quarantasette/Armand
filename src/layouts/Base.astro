@@ -11,21 +11,23 @@ import Piede from '../components/Piede.astro';
 import Apertura from '../components/Apertura.astro';
 import { sito, zone, telHref, waHref } from '../data/sito';
 import { foto } from '../data/foto';
+import { u } from '../lib/percorsi';
 
 interface Props { titolo: string; descrizione: string; indicizza?: boolean; }
 const { titolo, descrizione, indicizza = true } = Astro.props;
-const canonico = new URL(Astro.url.pathname, sito.url).href;
+// Gli indirizzi completi si possono scrivere solo quando si sa dove sta il sito (dominio o anteprima nota).
+const assoluto = (percorso: string) => (sito.origine ? new URL(percorso, sito.origine).href : '');
+const canonico = assoluto(Astro.url.pathname);
 const copertina = await getImage({ src: foto('facciata-dopo'), width: 1200, height: 630, format: 'jpg', fit: 'cover' });
-const copertinaUrl = new URL(copertina.src, sito.url).href;
-const tel = telHref(sito.tel1) || '/contatti/';
-const wa = waHref() || '/contatti/';
+const copertinaUrl = assoluto(copertina.src) || copertina.src;
+const tel = telHref(sito.tel1) || u('/contatti/');
+const wa = waHref() || u('/contatti/');
 
 const scheda = {
   '@context': 'https://schema.org',
   '@type': 'GeneralContractor',
   name: sito.nome,
-  url: sito.url + '/',
-  image: copertinaUrl,
+  ...(sito.origine ? { url: assoluto(u('/')), image: copertinaUrl } : {}),
   foundingDate: String(sito.dal),
   ...(sito.tel1 ? { telephone: sito.tel1 } : {}),
   ...(sito.email ? { email: sito.email } : {}),
@@ -41,16 +43,17 @@ const scheda = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{titolo}</title>
     <meta name="description" content={descrizione} />
-    <link rel="canonical" href={canonico} />
-    {!indicizza && <meta name="robots" content="noindex" />}
+    {/* In anteprima (dominio non ancora scritto in astro.config.mjs) nessuna pagina va su Google. */}
+    {!sito.anteprima && <link rel="canonical" href={canonico} />}
+    {(!indicizza || sito.anteprima) && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#F5F4F0" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="it_IT" />
     <meta property="og:site_name" content={sito.nome} />
     <meta property="og:title" content={titolo} />
     <meta property="og:description" content={descrizione} />
-    <meta property="og:url" content={canonico} />
+    {canonico && <meta property="og:url" content={canonico} />}
     <meta property="og:image" content={copertinaUrl} />
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(scheda)} />

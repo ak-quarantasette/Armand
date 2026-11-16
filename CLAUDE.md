@@ -28,7 +28,7 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 - **Servizi**: ristrutturazioni complete, ristrutturazioni interni, ristrutturazioni spazi commerciali, manutenzione e nuove coperture.
 - **Obiettivi**: buona SEO locale, grafica di alta gamma, sito veloce e fluido, perfetto su telefono e computer, animazione d'apertura.
 - **Contatti da pubblicare**: due numeri di telefono, un'email e il comune (Fara Gera d'Adda 24045, BG).
-  Li ha forniti l'utente in chat: non si salvano nella repo, il sito li legge da variabili d'ambiente.
+  Stanno in `src/data/sito.ts` insieme ai dati legali (vedi "Riservatezza").
 - **Canali di contatto sul sito**: chiamata, WhatsApp, email. Niente modulo, niente cookie, niente banner.
 - **Dominio**: non esiste ancora. Proposte da verificare: amcostruzionisnc.it, am-costruzioni.it, amcostruzionifara.it.
 - **Vecchio sito**: una pagina Jimdo provvisoria, da cancellare quando il nuovo è online. Nessun posizionamento da preservare.
@@ -90,13 +90,13 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - Dati legali e personali il meno visibili possibile, nei limiti di legge.
 - P.IVA: per legge va sulla home, quindi in piccolo nel footer. Ragione sociale completa, sede legale e REA
   solo in una pagina "Note legali" collegata dal footer.
-- Mai pubblicare né salvare nella repo: codici fiscali di persone, indirizzi privati, nomi dei soci
+- Mai pubblicare né salvare nella repo: codici fiscali di persone, indirizzi privati, PEC, nomi dei soci
   oltre a quanto compare nella ragione sociale.
 - Niente testo nascosto con trucchi (bianco su bianco e simili): non è a norma e penalizza la SEO.
-- Scelta dell'utente (2026-11-16): nella repo meno dati personali possibile. Telefoni, email, P.IVA, ragione
-  sociale, sede e REA non si scrivono in nessun file: il sito li legge da variabili d'ambiente (i nomi sono in
-  `.env.example`) e mostra solo quelli impostati. Vanno inseriti nel servizio di hosting: l'utente li ha già
-  dati in chat e li ridarà lì. Il numero WhatsApp è il primo dei due telefoni. Per le prove si usano dati finti.
+- Decisione aggiornata dall'utente (2026-11-16): quello che compare sul sito è pubblico comunque, quindi non è
+  riservato e sta in chiaro nella repo. Telefoni, email, P.IVA, ragione sociale, sede legale e REA sono in
+  `src/data/sito.ts` (niente più variabili d'ambiente). Il numero WhatsApp è il primo dei due telefoni.
+  Resta valida la richiesta sulla visibilità nel sito: dati legali in piccolo e fuori dai punti in vista.
 
 ## Fasi
 
@@ -119,13 +119,16 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 
 ## Codice del sito
 
-- `src/data/sito.ts`: dati dell'azienda e variabili d'ambiente. `src/data/foto.ts`: foto e testi alternativi.
+- `src/data/sito.ts`: dati dell'azienda, contatti e dati legali. `src/data/foto.ts`: foto e testi alternativi.
 - `src/lib/testi.ts`: legge `contenuti/*.md`, unica fonte dei testi, e li passa alle pagine.
+- `src/lib/percorsi.ts`: `u('/pagina/')` per ogni link interno, così il sito funziona anche in sottocartella.
+- `astro.config.mjs`: riga `DOMINIO` (vuota = anteprima, non indicizzata) e sottocartella `SITO_BASE`.
 - `src/layouts/Base.astro`: testa della pagina, dati per Google e lo script che decide se mostrare l'apertura.
 - `src/components/`: Intestazione, Piede, Apertura (monogramma e lamelle), Foto, Marchio, Azioni, Guida.
 - `src/scripts/muro.js`: apertura a mattoni; usa `public/apertura/` e `materiali/muro/celle.json`.
 - `src/pages/`: home, `[servizio]` (4 pagine), lavori, chi-siamo, contatti, note-legali, 404, robots.txt.
-- Prova: costruire con variabili finte, servire `dist/` (`python3 -m http.server -d dist`) e guardare con Playwright.
+- Prova: `npm run build`, servire `dist/` (`python3 -m http.server -d dist`) e guardare con Playwright.
+  Per provare come su Cloudflare (404, barre finali, intestazioni): `npx wrangler dev`.
 
 ## Regole di lavoro
 
@@ -142,7 +145,7 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - jimdosite.com e ufficiocamerale.it rispondono 403 dal cloud (blocco Cloudflare): non insistere,
   chiedere il materiale all'utente.
 - Google Fonts e cdnjs sono raggiungibili. Playwright con Chromium è preinstallato.
-- Scrivere nella repo dati legali o personali viene bloccato dal controllo dei permessi: chiedere prima all'utente.
+- Dati personali che non compaiono sul sito non vanno scritti nella repo: se servono, chiedere prima all'utente.
 
 ## Registro
 

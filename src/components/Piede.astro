@@ -3,11 +3,12 @@
 import Marchio from './Marchio.astro';
 import logoUrl from '../assets/logo-azienda.svg?url';
 import { sito, servizi, telHref, waHref } from '../data/sito';
+import { u } from '../lib/percorsi';
 const wa = waHref();
 ---
 <footer class="piede su-scuro">
   <div class="contenitore griglia">
-    <a class="targhetta" href="/" aria-label="Home">
+    <a class="targhetta" href={u('/')} aria-label="Home">
       <img src={logoUrl} width="121" height="64" alt="Logo A.M. Costruzioni snc" loading="lazy" />
     </a>
 
@@ -20,17 +21,17 @@ const wa = waHref();
     </ul>
 
     <ul class="lista">
-      {servizi.map((s) => <li><a href={`/${s.slug}/`}>{s.nome}</a></li>)}
-      <li><a href="/lavori/">Lavori</a></li>
-      <li><a href="/chi-siamo/">Chi siamo</a></li>
-      <li><a href="/contatti/">Contatti</a></li>
+      {servizi.map((s) => <li><a href={u(`/${s.slug}/`)}>{s.nome}</a></li>)}
+      <li><a href={u('/lavori/')}>Lavori</a></li>
+      <li><a href={u('/chi-siamo/')}>Chi siamo</a></li>
+      <li><a href={u('/contatti/')}>Contatti</a></li>
     </ul>
 
     <div class="legale">
       <Marchio soloMonogramma />
       <p>{sito.nomeLungo}</p>
       {sito.piva && <p>P.IVA {sito.piva}</p>}
-      <p><a href="/note-legali/">Note legali e privacy</a></p>
+      <p><a href={u('/note-legali/')}>Note legali e privacy</a></p>
     </div>
   </div>
 </footer>

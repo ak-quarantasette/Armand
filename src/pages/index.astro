@@ -7,6 +7,7 @@ import Guida from '../components/Guida.astro';
 import { pagina, sezione } from '../lib/testi';
 import { lavori } from '../data/foto';
 import { servizi } from '../data/sito';
+import { u } from '../lib/percorsi';
 
 const p = pagina('home');
 const grezzo = sezione(p, 'Dal grezzo al finito, un cantiere alla volta');
@@ -50,7 +51,7 @@ const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
       <ul class="servizi">
         {serv.sotto.map((s, i) => (
           <li>
-            <a href={`/${servizi[i].slug}/`}>
+            <a href={u(`/${servizi[i].slug}/`)}>
               <h3>{s.titolo}</h3>
               <div class="pila"><Blocchi blocchi={s.blocchi} /></div>
               <span class="vai" aria-hidden="true">Scopri</span>
@@ -64,7 +65,7 @@ const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
   <section class="sezione">
     <div class="contenitore due">
       <h2 class="maschera"><span>{pl.h1}</span></h2>
-      <div class="pila"><Blocchi blocchi={pl.intro} /><a class="b2" href="/lavori/">Tutti i lavori</a></div>
+      <div class="pila"><Blocchi blocchi={pl.intro} /><a class="b2" href={u('/lavori/')}>Tutti i lavori</a></div>
     </div>
     <div class="contenitore sfalsata">
       {vetrina.map((l) => (
