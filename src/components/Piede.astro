@@ -1,0 +1,54 @@
+---
+// Piede: fascia scura con il logo su targhetta bianca, i contatti e, in piccolo, i dati di legge.
+import Marchio from './Marchio.astro';
+import logoUrl from '../assets/logo-azienda.svg?url';
+import { sito, servizi, telHref, waHref } from '../data/sito';
+const wa = waHref();
+---
+<footer class="piede su-scuro">
+  <div class="contenitore griglia">
+    <a class="targhetta" href="/" aria-label="Home">
+      <img src={logoUrl} width="121" height="64" alt="Logo A.M. Costruzioni snc" loading="lazy" />
+    </a>
+
+    <ul class="lista">
+      {sito.tel1 && <li><a href={telHref(sito.tel1)}>{sito.tel1}</a></li>}
+      {sito.tel2 && <li><a href={telHref(sito.tel2)}>{sito.tel2}</a></li>}
+      {wa && <li><a href={wa} rel="noopener">WhatsApp</a></li>}
+      {sito.email && <li><a href={`mailto:${sito.email}`}>{sito.email}</a></li>}
+      <li>{sito.comune} ({sito.provincia})</li>
+    </ul>
+
+    <ul class="lista">
+      {servizi.map((s) => <li><a href={`/${s.slug}/`}>{s.nome}</a></li>)}
+      <li><a href="/lavori/">Lavori</a></li>
+      <li><a href="/chi-siamo/">Chi siamo</a></li>
+      <li><a href="/contatti/">Contatti</a></li>
+    </ul>
+
+    <div class="legale">
+      <Marchio soloMonogramma />
+      <p>{sito.nomeLungo}</p>
+      {sito.piva && <p>P.IVA {sito.piva}</p>}
+      <p><a href="/note-legali/">Note legali e privacy</a></p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .piede { background: var(--ardesia); color: var(--su-scuro); padding-block: clamp(40px, 6vw, 72px); font-size: 0.97rem; }
+  .griglia { display: grid; grid-template-columns: auto repeat(2, minmax(0, 1fr)) auto; gap: 32px clamp(28px, 5vw, 72px); align-items: start; }
+  .targhetta { display: inline-block; padding: 12px 16px; background: #fff; }
+  .targhetta img { height: 64px; width: auto; }
+  .lista { list-style: none; display: grid; gap: 6px; }
+  .piede a { color: var(--su-scuro); text-decoration-color: rgba(245, 244, 240, 0.35); }
+  .piede a:hover { text-decoration-color: currentColor; }
+  .legale { display: grid; gap: 4px; justify-items: end; text-align: right; color: var(--su-scuro-2); font-size: 0.84rem; }
+  .legale :global(.marchio) { color: var(--su-scuro); font-size: 1.1rem; margin-bottom: 8px; }
+  .legale a { color: var(--su-scuro-2); }
+  @media (max-width: 900px) {
+    .griglia { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .legale { justify-items: start; text-align: left; }
+  }
+  @media (max-width: 560px) { .griglia { grid-template-columns: minmax(0, 1fr); } }
+</style>

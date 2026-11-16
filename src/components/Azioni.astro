@@ -1,0 +1,10 @@
+---
+// I due pulsanti principali: chiamata e WhatsApp. Se i numeri non sono impostati, portano alla pagina Contatti.
+import { sito, telHref, waHref } from '../data/sito';
+const tel = telHref(sito.tel1) || '/contatti/';
+const wa = waHref() || '/contatti/';
+---
+<div class="azioni">
+  <a class="b1" href={tel}>Chiama</a>
+  <a class="b2" href={wa} rel={wa.startsWith('http') ? 'noopener' : undefined}>Scrivi su WhatsApp</a>
+</div>

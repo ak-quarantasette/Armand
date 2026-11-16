@@ -38,6 +38,6 @@ Con ponteggi e protezioni a norma, per la sicurezza di chi lavora e di chi abita
 
 ## Parliamone
 
-Sopralluogo e preventivo sono gratuiti e senza impegno.
+La consulenza è gratuita.
 
 Pulsanti: Chiama, Scrivi su WhatsApp

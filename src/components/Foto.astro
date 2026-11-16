@@ -1,0 +1,30 @@
+---
+// Una foto in cornice: versioni AVIF e WebP per ogni schermo, con il cartiglio sotto.
+import { Picture } from 'astro:assets';
+import { foto, alt } from '../data/foto';
+interface Props { nome: string; sizes?: string; subito?: boolean; voci?: [string, string][]; classe?: string; proporzione?: string; }
+const { nome, sizes = '(min-width: 1000px) 46vw, 92vw', subito = false, voci = [], classe = '', proporzione } = Astro.props;
+const src = foto(nome);
+const larghezze = [420, 640, 860, 1100, 1440].filter((w) => w <= src.width);
+---
+<figure class:list={['foto', classe]}>
+  <Picture
+    src={src}
+    formats={['avif', 'webp']}
+    fallbackFormat="jpg"
+    widths={larghezze}
+    sizes={sizes}
+    alt={alt[nome] ?? ''}
+    loading={subito ? 'eager' : 'lazy'}
+    fetchpriority={subito ? 'high' : undefined}
+    decoding="async"
+    style={proporzione ? `aspect-ratio:${proporzione};object-fit:cover` : undefined}
+  />
+  {voci.length > 0 && (
+    <figcaption>
+      <dl class="cartiglio">
+        {voci.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
+      </dl>
+    </figcaption>
+  )}
+</figure>

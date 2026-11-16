@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import Azioni from '../components/Azioni.astro';
+import Blocchi from '../components/Blocchi.astro';
+import Foto from '../components/Foto.astro';
+import { pagina } from '../lib/testi';
+import { lavori } from '../data/foto';
+
+const p = pagina('lavori');
+const tutti = lavori();
+const gruppi = [...new Set(tutti.map((l) => l.gruppo))];
+---
+<Base titolo={p.titolo} descrizione={p.descrizione}>
+  <section class="contenitore cima">
+    <h1>{p.h1}</h1>
+    <div class="intro"><Blocchi blocchi={p.intro} /></div>
+  </section>
+
+  {gruppi.map((g, gi) => (
+    <section class="sezione">
+      <div class="contenitore">
+        <h2>{g}</h2>
+        <div class="griglia">
+          {tutti.filter((l) => l.gruppo === g).map((l, i) => (
+            <article class:list={['lavoro', { doppio: l.foto.length > 1 }]}>
+              <div class="scatti">
+                {l.foto.map((n) => <Foto nome={n} classe="entra" subito={gi === 0 && i === 0} sizes={l.foto.length > 1 ? '(min-width: 900px) 46vw, 92vw' : '(min-width: 900px) 44vw, 92vw'} />)}
+              </div>
+              <dl class="cartiglio">
+                <dt>Lavoro</dt><dd>{l.titolo}</dd>
+                <dt>Note</dt><dd set:html={l.didascalia} />
+              </dl>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <section class="invito su-scuro">
+    <div class="contenitore pila">
+      <h2>Hai un lavoro in mente?</h2>
+      <p>Raccontacelo: la consulenza è gratuita.</p>
+      <Azioni />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .cima { display: grid; gap: 22px; padding-block: clamp(28px, 5vw, 64px) clamp(36px, 5vw, 64px); }
+  .intro :global(p) { font-size: clamp(1.15rem, 1.9vw, 1.4rem); line-height: 1.5; max-width: 46ch; }
+  .griglia { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(40px, 6vw, 96px) clamp(18px, 3.5vw, 48px); align-items: start; margin-top: clamp(28px, 4vw, 52px); }
+  .lavoro { min-width: 0; }
+  .lavoro:nth-child(even):not(.doppio) { margin-top: clamp(0px, 8vw, 120px); }
+  .doppio { grid-column: 1 / -1; }
+  .doppio .scatti { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(14px, 3vw, 40px); align-items: end; }
+  .invito { background: var(--ardesia); color: var(--su-scuro); padding-block: clamp(56px, 8vw, 104px); }
+  .invito p { font-size: 1.15rem; color: var(--su-scuro-2); }
+  @media (max-width: 700px) {
+    .griglia { grid-template-columns: minmax(0, 1fr); }
+    .lavoro:nth-child(even):not(.doppio) { margin-top: 0; }
+  }
+</style>

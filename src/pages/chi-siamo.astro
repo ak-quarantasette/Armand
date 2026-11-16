@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import Azioni from '../components/Azioni.astro';
+import Blocchi from '../components/Blocchi.astro';
+import Foto from '../components/Foto.astro';
+import { pagina } from '../lib/testi';
+
+const p = pagina('chi-siamo');
+---
+<Base titolo={p.titolo} descrizione={p.descrizione}>
+  <section class="contenitore cima">
+    <div class="pila">
+      <h1>{p.h1}</h1>
+      <div class="intro pila"><Blocchi blocchi={p.intro} /></div>
+    </div>
+    <Foto nome="soggiorno" subito sizes="(min-width: 900px) 46vw, 92vw" voci={[['Lavoro', 'Soggiorno ristrutturato']]} />
+  </section>
+
+  {p.sezioni.map((s, i) => (
+    <section class:list={['sezione', { fascia: i % 2 === 0 }]}>
+      <div class="contenitore due">
+        <h2 class="maschera"><span>{s.titolo}</span></h2>
+        <div class="pila"><Blocchi blocchi={s.blocchi} elenco /></div>
+      </div>
+    </section>
+  ))}
+
+  <section class="invito su-scuro">
+    <div class="contenitore pila">
+      <h2>Hai un lavoro in mente?</h2>
+      <p>Raccontacelo: la consulenza è gratuita.</p>
+      <Azioni />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .cima { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(24px, 4.5vw, 72px); align-items: end; padding-block: clamp(28px, 5vw, 64px) clamp(56px, 8vw, 110px); }
+  .intro :global(p) { font-size: clamp(1.12rem, 1.7vw, 1.3rem); line-height: 1.55; max-width: 40ch; }
+  .due { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(20px, 4.5vw, 72px); align-items: start; }
+  .due :global(.elenco) { width: 100%; }
+  .invito { background: var(--ardesia); color: var(--su-scuro); padding-block: clamp(56px, 8vw, 104px); }
+  .invito p { font-size: 1.15rem; color: var(--su-scuro-2); }
+  @media (max-width: 900px) { .cima, .due { grid-template-columns: minmax(0, 1fr); } }
+</style>

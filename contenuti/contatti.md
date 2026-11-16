@@ -1,6 +1,6 @@
 ---
 titolo: "Contatti | A.M. Costruzioni, Fara Gera d'Adda"
-descrizione: "Chiama o scrivi su WhatsApp ad A.M. Costruzioni, impresa edile a Fara Gera d'Adda (BG): sopralluogo e preventivo senza impegno."
+descrizione: "Chiama o scrivi su WhatsApp ad A.M. Costruzioni, impresa edile a Fara Gera d'Adda (BG): consulenza gratuita."
 url: /contatti/
 ---
 
@@ -13,4 +13,4 @@ Raccontaci il lavoro che hai in mente. Rispondiamo al telefono e su WhatsApp; se
 - **Email**: {{email}}
 - **Sede**: Fara Gera d'Adda (BG)
 
-Sopralluogo e preventivo sono gratuiti e senza impegno.
+La consulenza è gratuita.

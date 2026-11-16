@@ -1,6 +1,6 @@
 ---
 titolo: "Ristrutturazioni a Fara Gera d'Adda | A.M. Costruzioni"
-descrizione: "Impresa edile a Fara Gera d'Adda dal 2017: ristrutturazioni complete, interni, negozi e uffici, tetti e coperture. Sopralluogo e preventivo senza impegno."
+descrizione: "Impresa edile a Fara Gera d'Adda dal 2017: ristrutturazioni complete, interni, negozi e uffici, tetti e coperture. Consulenza gratuita."
 url: /
 ---
 
@@ -49,6 +49,6 @@ Abbiamo sede a Fara Gera d'Adda e lavoriamo nei comuni vicini, tra la Bassa Berg
 
 ## Hai un lavoro in mente?
 
-Raccontacelo. Sopralluogo e preventivo sono gratuiti e senza impegno.
+Raccontacelo: la consulenza è gratuita.
 
 Pulsanti: Chiama, Scrivi su WhatsApp

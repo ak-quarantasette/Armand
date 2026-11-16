@@ -1,0 +1,23 @@
+---
+// Guida verticale a sinistra, solo su schermi larghi: mentre si scorre la pagina il segno scende,
+// dal sopralluogo alla consegna. Si appoggia a una funzione dei browser recenti; dove manca, non compare.
+const tappe = ['Sopralluogo', 'Preventivo', 'Cantiere', 'Consegna'];
+---
+<div class="guida" aria-hidden="true">
+  <span class="filo"><i></i></span>
+  <ul>{tappe.map((t) => <li>{t}</li>)}</ul>
+</div>
+
+<style>
+  .guida { display: none; }
+  @media (min-width: 1500px) and (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      .guida { position: fixed; left: 26px; top: 50%; z-index: 5; display: grid; grid-template-columns: 9px auto; gap: 12px; height: 228px; margin-top: -114px; color: var(--pietra); font-size: 0.72rem; letter-spacing: 0.04em; }
+      .filo { position: relative; justify-self: center; width: 1px; background: var(--linea); }
+      .filo i { position: absolute; left: -4px; top: 0; width: 9px; height: 9px; background: var(--blu); transform: rotate(45deg); animation: scende linear both; animation-timeline: scroll(root); }
+      ul { list-style: none; display: grid; align-content: space-between; }
+      li { line-height: 9px; }
+    }
+  }
+  @keyframes scende { to { top: calc(100% - 9px); } }
+</style>

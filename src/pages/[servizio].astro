@@ -1,0 +1,95 @@
+---
+// Le quattro pagine dei servizi: stessi blocchi, testi diversi (contenuti/servizi/*.md).
+import Base from '../layouts/Base.astro';
+import Azioni from '../components/Azioni.astro';
+import Blocchi from '../components/Blocchi.astro';
+import Foto from '../components/Foto.astro';
+import { pagina } from '../lib/testi';
+import { servizi } from '../data/sito';
+
+export function getStaticPaths() {
+  return servizi.map((s) => ({ params: { servizio: s.slug }, props: { file: s.file } }));
+}
+const { file } = Astro.props as { file: string };
+const p = pagina(file);
+const immagini: Record<string, string[]> = {
+  'ristrutturazioni-complete': ['cucina-soggiorno', 'cantiere-massetto'],
+  'ristrutturazioni-interni': ['bagno-doccia', 'cantiere-doccia-in-muratura'],
+  'ristrutturazioni-spazi-commerciali': ['facciata-dopo'],
+  coperture: [],
+};
+const foto = immagini[Astro.params.servizio!] ?? [];
+const corpo = p.sezioni.filter((s) => s.titolo !== 'Parliamone');
+const invito = p.sezioni.find((s) => s.titolo === 'Parliamone');
+const altri = servizi.filter((s) => s.slug !== Astro.params.servizio);
+---
+<Base titolo={p.titolo} descrizione={p.descrizione}>
+  <section class="contenitore cima">
+    <p class="tenue briciole"><a href="/">Home</a> <span aria-hidden="true">/</span> <a href="/#servizi">Servizi</a></p>
+    <h1>{p.h1}</h1>
+    <div class="grande-intro"><Blocchi blocchi={p.intro} /></div>
+  </section>
+
+  <section class:list={['contenitore', 'corpo', { 'senza-foto': foto.length === 0 }]}>
+    <div class="prosa">
+      {corpo.map((s) => (
+        <section class="parte">
+          <h2>{s.titolo}</h2>
+          <Blocchi blocchi={s.blocchi} elenco />
+          {s.sotto.map((q) => (
+            <div class="domanda">
+              <h3>{q.titolo}</h3>
+              <Blocchi blocchi={q.blocchi} />
+            </div>
+          ))}
+        </section>
+      ))}
+    </div>
+    {foto.length > 0 && (
+      <div class="immagini">
+        {foto.map((n, i) => <Foto nome={n} subito={i === 0} sizes="(min-width: 900px) 40vw, 92vw" />)}
+      </div>
+    )}
+  </section>
+
+  <section class="invito su-scuro">
+    <div class="contenitore pila">
+      <h2>{invito?.titolo ?? 'Parliamone'}</h2>
+      {invito && <Blocchi blocchi={invito.blocchi} />}
+      <Azioni />
+    </div>
+  </section>
+
+  <section class="sezione">
+    <div class="contenitore">
+      <h2>Gli altri servizi</h2>
+      <ul class="altri">
+        {altri.map((s) => <li><a href={`/${s.slug}/`}>{s.nome}</a></li>)}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .cima { display: grid; gap: 22px; padding-block: clamp(28px, 5vw, 64px) clamp(36px, 5vw, 64px); }
+  .briciole { font-size: 0.9rem; }
+  .briciole a { color: var(--pietra); }
+  .grande-intro :global(p) { font-size: clamp(1.15rem, 1.9vw, 1.4rem); line-height: 1.5; max-width: 46ch; }
+  .corpo { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(28px, 5vw, 88px); align-items: start; padding-bottom: clamp(60px, 9vw, 120px); }
+  .corpo.senza-foto { grid-template-columns: minmax(0, 46rem); }
+  .prosa { gap: clamp(44px, 6vw, 72px); }
+  .parte { display: grid; gap: 18px; }
+  .parte h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+  .domanda { display: grid; gap: 8px; padding-top: 18px; border-top: 1px solid var(--linea); }
+  .domanda h3 { font-family: var(--ft); font-weight: 600; font-size: 1.08rem; line-height: 1.4; }
+  .immagini { display: grid; gap: clamp(20px, 3vw, 36px); position: sticky; top: calc(var(--testata) + 24px); }
+  .invito { background: var(--ardesia); color: var(--su-scuro); padding-block: clamp(56px, 8vw, 104px); }
+  .invito :global(p) { font-size: 1.15rem; color: var(--su-scuro-2); }
+  .altri { list-style: none; display: grid; margin-top: 28px; border-top: 1px solid var(--antracite); max-width: 46rem; }
+  .altri a { display: block; padding: 16px 0; border-bottom: 1px solid var(--linea); font-family: var(--fd); font-size: 1.35rem; color: var(--antracite); text-decoration: none; }
+  .altri a:hover { color: var(--blu); }
+  @media (max-width: 900px) {
+    .corpo { grid-template-columns: minmax(0, 1fr); }
+    .immagini { position: static; }
+  }
+</style>

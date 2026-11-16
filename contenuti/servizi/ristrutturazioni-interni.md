@@ -33,6 +33,6 @@ Sì. Puoi fornirli tu, oppure sceglierli con noi dai rivenditori con cui lavoria
 
 ## Parliamone
 
-Sopralluogo e preventivo sono gratuiti e senza impegno.
+La consulenza è gratuita.
 
 Pulsanti: Chiama, Scrivi su WhatsApp

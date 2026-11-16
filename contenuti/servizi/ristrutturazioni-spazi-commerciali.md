@@ -33,6 +33,6 @@ Sì. Fissiamo le date con chi monta arredi e impianti, così le lavorazioni non 
 
 ## Parliamone
 
-Sopralluogo e preventivo sono gratuiti e senza impegno.
+La consulenza è gratuita.
 
 Pulsanti: Chiama, Scrivi su WhatsApp

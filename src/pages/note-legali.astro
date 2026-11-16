@@ -1,0 +1,42 @@
+---
+// Dati di legge e privacy. I dati societari arrivano dalle variabili d'ambiente:
+// qui compaiono solo quelli impostati, senza altre informazioni personali.
+import Base from '../layouts/Base.astro';
+import Blocchi from '../components/Blocchi.astro';
+import { pagina, sezione } from '../lib/testi';
+import { sito } from '../data/sito';
+
+const p = pagina('note-legali');
+const privacy = sezione(p, 'Privacy');
+const dati: [string, string][] = [
+  ['Ragione sociale', sito.ragioneSociale || sito.nomeLungo],
+  ['Sede legale', sito.sedeLegale],
+  ['Partita IVA e codice fiscale', sito.piva],
+  ['REA', sito.rea],
+].filter((r) => r[1]) as [string, string][];
+---
+<Base titolo={p.titolo} descrizione={p.descrizione}>
+  <section class="contenitore cima">
+    <h1>{p.h1}</h1>
+
+    <section class="parte">
+      <h2>Dati societari</h2>
+      <dl class="cartiglio dati">
+        {dati.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
+      </dl>
+    </section>
+
+    <section class="parte prosa">
+      <h2>{privacy.titolo}</h2>
+      <Blocchi blocchi={privacy.blocchi} />
+    </section>
+  </section>
+</Base>
+
+<style>
+  .cima { display: grid; gap: clamp(36px, 5vw, 60px); max-width: calc(46rem + 2 * var(--bordo)); margin-inline: 0 auto; padding-block: clamp(28px, 5vw, 64px) clamp(72px, 10vw, 140px); }
+  h1 { font-size: clamp(2rem, 4.6vw, 3.1rem); }
+  .parte { display: grid; gap: 18px; }
+  .parte h2 { font-size: clamp(1.4rem, 2.6vw, 1.8rem); }
+  .dati { font-size: 0.97rem; gap: 8px 28px; margin: 0; }
+</style>

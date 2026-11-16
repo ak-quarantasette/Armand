@@ -1,6 +1,6 @@
 ---
 titolo: "Ristrutturazioni complete di case | A.M. Costruzioni"
-descrizione: "Ristrutturazione completa di case e appartamenti: demolizioni, muratura, impianti, pavimenti e finiture con un'unica impresa. Preventivo senza impegno."
+descrizione: "Ristrutturazione completa di case e appartamenti: demolizioni, muratura, impianti, pavimenti e finiture con un'unica impresa. Consulenza gratuita."
 url: /ristrutturazioni-complete/
 ---
 
@@ -38,6 +38,6 @@ Per molti lavori serve una pratica edilizia firmata da un tecnico. Lavoriamo con
 
 ## Parliamone
 
-Sopralluogo e preventivo sono gratuiti e senza impegno.
+La consulenza è gratuita.
 
 Pulsanti: Chiama, Scrivi su WhatsApp
