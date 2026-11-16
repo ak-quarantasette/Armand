@@ -18,7 +18,7 @@ const dove = sezione(p, 'Dove lavoriamo');
 const invito = sezione(p, 'Hai un lavoro in mente?');
 const passi = come.blocchi.find((b) => b.tipo === 'ol');
 const pl = pagina('lavori');
-const scelti = ['soggiorno', 'bagno-doccia', 'cucina-soggiorno', 'scala-in-legno'];
+const scelti = ['soggiorno', 'tetto-coppi-posati', 'cucina-soggiorno', 'bagno-doccia'];
 const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
 ---
 <Base titolo={p.titolo} descrizione={p.descrizione}>

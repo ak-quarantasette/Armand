@@ -1,13 +1,14 @@
 ---
 // Apertura animata, una sola volta per visita (lo decide lo script in testa alla pagina).
-// Telefono: il monogramma si disegna, compare il nome, la schermata si apre a lamelle. Solo CSS.
-// Computer: sopra lo stesso schermo si costruisce un muro di mattoni che il cursore fa crollare.
+// Telefono: compare il logo dell'azienda, poi la schermata si apre a lamelle. Solo CSS.
+// Computer: sopra lo stesso schermo si costruisce un muro di mattoni che il cursore fa crollare,
+// e dietro resta il logo.
+import logoUrl from '../assets/logo-azienda.svg?url';
 ---
 <div class="velo" aria-hidden="true">
   <div class="lamelle">{Array.from({ length: 12 }, (_, i) => <i style={`--i:${i}`}></i>)}</div>
   <div class="segno">
-    <svg class="mono" viewBox="-6 -13 164 113"><polyline pathLength="100" points="-3.2,110 32,0 64,100 84,0 108,62 132,0 154,110" stroke-width="6"/><line pathLength="100" x1="16.5" y1="66" x2="47.5" y2="66" stroke-width="3.2"/></svg>
-    <span class="scritta">A<i>.</i>M<i class="r">.</i> Costruzioni</span>
+    <img src={logoUrl} width="392" height="207" alt="" />
   </div>
   <canvas class="muro"></canvas>
 </div>
@@ -35,14 +36,11 @@
   .velo .lamelle { position: absolute; inset: 0; display: grid; grid-template-rows: repeat(12, 1fr); }
   .velo .lamelle i { background: var(--calce); box-shadow: 0 0 0 1px var(--calce); transform-origin: 50% 0; }
   .velo .segno { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: clamp(14px, 2vw, 26px); color: var(--antracite); }
-  .velo .segno .mono { font-size: clamp(64px, 11vw, 150px); overflow: hidden; }
-  .velo .segno .scritta { font-size: clamp(13px, 2.2vw, 30px); }
+  .velo .segno img { width: clamp(200px, 30vw, 420px); height: auto; }
   .velo .muro { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-  /* il monogramma si disegna con un tratto, poi compare il nome */
-  html.apertura .velo polyline { stroke-dasharray: 100; animation: ap-traccia 0.95s cubic-bezier(0.65, 0, 0.35, 1) both; }
-  html.apertura .velo line { stroke-dasharray: 100; animation: ap-traccia 0.3s ease-out 0.72s both; }
-  html.apertura .velo .scritta { animation: ap-sali 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) 0.92s both; }
+  /* il logo compare salendo appena */
+  html.apertura .velo .segno img { animation: ap-sali 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both; }
 
   /* uscita: le lamelle si aprono e il marchio svanisce. Su telefono parte da sola. */
   html.apertura-tel .velo .lamelle i { animation: ap-lamella 0.44s cubic-bezier(0.6, 0, 0.3, 1) both; animation-delay: calc(1.55s + var(--i) * 0.035s); }
@@ -50,8 +48,7 @@
   html.apertura-apri .velo .lamelle i { animation: ap-lamella 0.44s cubic-bezier(0.6, 0, 0.3, 1) both; animation-delay: calc(0.12s + var(--i) * 0.035s); }
   html.apertura-apri .velo .segno { animation: ap-via 0.3s linear both; }
 
-  @keyframes ap-traccia { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
-  @keyframes ap-sali { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes ap-sali { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @keyframes ap-lamella { from { transform: rotateX(0deg); opacity: 1; } to { transform: rotateX(89deg); opacity: 0; } }
   @keyframes ap-via { to { opacity: 0; } }
 </style>

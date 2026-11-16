@@ -14,10 +14,10 @@ export function getStaticPaths() {
 const { file } = Astro.props as { file: string };
 const p = pagina(file);
 const immagini: Record<string, string[]> = {
-  'ristrutturazioni-complete': ['cucina-soggiorno', 'cantiere-massetto'],
+  'ristrutturazioni-complete': ['cucina-soggiorno', 'cantiere-riscaldamento-a-pavimento'],
   'ristrutturazioni-interni': ['bagno-doccia', 'cantiere-doccia-in-muratura'],
   'ristrutturazioni-spazi-commerciali': ['facciata-dopo'],
-  coperture: [],
+  coperture: ['tetto-colmo-nuovo', 'tetto-listelli-e-telo'],
 };
 const foto = immagini[Astro.params.servizio!] ?? [];
 const corpo = p.sezioni.filter((s) => s.titolo !== 'Parliamone');
