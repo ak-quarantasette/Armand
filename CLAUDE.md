@@ -9,8 +9,13 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 - **Fase in corso**: fasi 1-3 chiuse. Fase 4 (verifiche) fatta con Chromium su telefono, tablet e computer;
   manca solo la prova su iPhone, che fa l'utente. Fase 5 (pubblicazione) avviata: il sito è su `main` e
   l'anteprima è su GitHub Pages, https://ak-quarantasette.github.io/Armand/ (vedi "Pubblicazione").
-- **Scelte già confermate**: caratteri A, marchio 1, logo in alto a destra con i colori attenuati, apertura a
-  mattoni con ombra e spessore, testi approvati (si parla solo di "consulenza gratuita").
+- **Scelte già confermate**: caratteri A, logo dell'azienda in alto a destra con i colori attenuati come unico
+  marchio, apertura a mattoni con ombra e spessore, testi approvati (si parla solo di "consulenza gratuita").
+- **Scelte cambiate dall'utente il 2026-11-16 (valgono queste, non quelle del piano)**:
+  - il marchio nuovo "Tetti" (monogramma AM e scritta) è stato tolto ovunque: resta solo il logo
+    dell'azienda, in alto a destra, nel piede, nelle due aperture e come icona;
+  - i colori di fondo passano in modo continuo da bianco freddo in cima a toni caldi in fondo
+    (vedi "Scorrimento"); la fascia scura finale è bruno caldo `#2C241E`, non più ardesia.
 - **Anteprime vecchie** (artifact privati dell'utente; si leggono con lo strumento Artifact). Servono solo come
   storico, ora fa fede il sito costruito:
   grafica https://claude.ai/artifact/8Fb5WGHMtMJ6gDYfgVgBQq ·
@@ -86,8 +91,8 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   chiesto l'effetto "doppio fondo". Parte solo con `(hover: hover) and (pointer: fine)` e schermo da 900 px in su.
   Durata misurata: 7-8 secondi se nessuno tocca nulla (dopo 3 secondi di muro finito crolla da solo); finché il
   visitatore gioca col mouse va avanti, al massimo 7,5 secondi di gioco. Clic, tasto o rotella: crolla subito.
-- **Telefono, "Il tetto"** (automatica, circa 2 secondi): il monogramma si disegna con un tratto solo,
-  appare il nome, la schermata si apre a lamelle orizzontali. Solo CSS e SVG.
+- **Telefono** (automatica, circa 2 secondi): compare il logo dell'azienda, poi la schermata si apre a
+  lamelle orizzontali. Solo CSS. Anche su computer dietro il muro c'è il logo dell'azienda.
 
 ## Scorrimento (com'è fatto)
 
@@ -103,8 +108,9 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   del CSS li fonde in una forma che i browser scartano: in `npm run dev` funziona, nel sito costruito il
   movimento sparisce senza errori. Usare le proprietà lunghe (`animation-name`, ...), come in `Guida.astro`.
   Le animazioni vanno sempre controllate sul sito costruito, in movimento, non su schermate ferme.
-- **Non fatto, da proporre all'utente se lo chiede**: lo sfondo che cambia tono in modo graduale come nel
-  riferimento. Oggi le sezioni alternano due toni chiari e chiudono sulla fascia scura.
+- **Colori che cambiano scorrendo** (richiesta dell'utente): uno script in testa a `Base.astro` scrive in
+  `--caldo` quanto si è scesi (0-1); in `global.css` sfondo, fasce e filetti sono miscele `color-mix` tra le
+  coppie `--f-*` (freddo) e `--c-*` (caldo). Vale per tutte le pagine. Per ritoccare i toni si cambiano le coppie.
 
 ## Pubblicazione
 
@@ -158,7 +164,9 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 
 ## Materiali
 
-- `materiali/originali/`: logo attuale e 11 foto dell'utente, alla risoluzione massima disponibile (1440 px).
+- `materiali/originali/`: logo attuale e 27 foto dell'utente, al massimo 1440 px di lato. Le 16 arrivate il
+  2026-11-16 sono tetti (coppi, lamiera, fasi del rifacimento) e cantieri (massetti, vespaio, solaio, scavo).
+  Le foto nuove l'utente le carica nella cartella principale di `main`: vanno rinominate e spostate qui.
   Finiti: facciata prima e dopo dello stesso edificio, bagno con doccia, parete con carta da parati,
   soggiorno, cucina-soggiorno, sala da pranzo, scala in legno. In corso d'opera: doccia in muratura,
   massetto, stanza in cantiere. Sono già leggere: il sito ne genera versioni AVIF/WebP per ogni schermo.
@@ -174,7 +182,7 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - `astro.config.mjs`: riga `DOMINIO` (vuota = anteprima, non indicizzata) e sottocartella `SITO_BASE`.
 - `src/layouts/Base.astro`: testa della pagina, dati per Google e i due script in linea: comparsa lenta
   mentre si scorre e scelta dell'apertura.
-- `src/components/`: Intestazione, Piede, Apertura (monogramma e lamelle), Foto, Marchio, Azioni, Guida.
+- `src/components/`: Intestazione, Piede, Apertura (logo e lamelle), Foto, Azioni, Guida.
 - `src/scripts/muro.js`: apertura a mattoni; usa `public/apertura/` e `materiali/muro/celle.json`.
 - `src/pages/`: home, `[servizio]` (4 pagine), lavori, chi-siamo, contatti, note-legali, 404, robots.txt.
 - Prova: `npm run build`, servire `dist/` (`python3 -m http.server -d dist`) e guardare con Playwright.
@@ -229,3 +237,6 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - 2026-11-16: l'utente accende Pages in modalità "Deploy from a branch" e la costruzione di GitHub fallisce
   sui file `.astro`; chiede di farlo funzionare così, con un index come negli altri suoi siti. Fatti: pagine
   pronte su `main` (`anteprima/`, `index.html`, `404.html`, `.nojekyll`) e flusso che le aggiorna da solo.
+- 2026-11-16: l'utente vede l'anteprima e chiede tre modifiche. Fatte: colori dal freddo al caldo lungo la
+  pagina, solo il logo dell'azienda (tolto il marchio "Tetti", anche dalle aperture), 16 foto nuove in Lavori,
+  nella pagina Coperture e in home. Didascalie scritte guardando le foto: da far confermare.

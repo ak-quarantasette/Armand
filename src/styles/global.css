@@ -1,20 +1,30 @@
 /* A.M. Costruzioni: stile del sito.
    Impaginazione ariosa da rivista, allineata a sinistra: molto bianco, foto in cornice, filetti sottili.
-   I colori vengono dai cantieri (calce, pietra, ardesia) più il blu e il rosso del logo. */
+   I colori vengono dai cantieri (calce, pietra, terra) più il blu e il rosso del logo.
+
+   COLORI CHE CAMBIANO SCORRENDO (richiesta del cliente): la pagina parte bianca e fredda e arriva calda in
+   fondo, in modo continuo. Lo script in testa a Base.astro scrive in --caldo quanto si è scesi (da 0 a 1);
+   qui ogni colore di fondo è una miscela tra la versione fredda e quella calda. Senza JavaScript resta fredda.
+   Per ritoccare i toni basta cambiare le coppie --f-* (freddo) e --c-* (caldo). */
 
 :root {
-  --calce: #F5F4F0;      /* sfondo */
-  --calce-2: #FBFAF8;    /* superfici chiare */
-  --calce-3: #ECEAE4;    /* fasce appena più scure */
+  --caldo: 0;
+  --f-calce: #F3F5F6;  --c-calce: #F5EADB;   /* sfondo */
+  --f-calce-2: #FAFBFC; --c-calce-2: #FBF3E8; /* superfici chiare */
+  --f-calce-3: #E7EBED; --c-calce-3: #EBDBC6; /* fasce appena più scure */
+  --f-linea: #CBD2D6;  --c-linea: #D6C3AB;   /* filetti */
+  --calce: var(--f-calce);
+  --calce-2: var(--f-calce-2);
+  --calce-3: var(--f-calce-3);
+  --linea: var(--f-linea);
   --antracite: #1F2327;  /* testi */
-  --pietra: #5E656B;     /* testi secondari */
-  --linea: #D4D1C9;      /* filetti */
-  --ardesia: #252C33;    /* fascia scura */
+  --pietra: #555B60;     /* testi secondari */
+  --ardesia: #2C241E;    /* fascia scura in fondo alla pagina: bruno caldo */
   --blu: #184898;        /* pulsanti e link */
   --blu-scuro: #123A7C;
   --rosso: #902020;      /* piccoli dettagli */
-  --su-scuro: #F5F4F0;
-  --su-scuro-2: #AEB4BA;
+  --su-scuro: #F7F0E6;
+  --su-scuro-2: #C2B6A8;
   --blu-chiaro: #8FB2EE;
   --rosso-chiaro: #E27F74;
   --fd: 'Marcellus', 'Times New Roman', serif;
@@ -24,6 +34,16 @@
   --testata: 76px;
   --morbido: cubic-bezier(0.22, 0.61, 0.36, 1); /* arrivo lento e morbido */
   color-scheme: light;
+}
+
+@supports (color: color-mix(in oklab, red, blue)) {
+  :root {
+    --quanto: calc(var(--caldo) * 100%);
+    --calce: color-mix(in oklab, var(--f-calce), var(--c-calce) var(--quanto));
+    --calce-2: color-mix(in oklab, var(--f-calce-2), var(--c-calce-2) var(--quanto));
+    --calce-3: color-mix(in oklab, var(--f-calce-3), var(--c-calce-3) var(--quanto));
+    --linea: color-mix(in oklab, var(--f-linea), var(--c-linea) var(--quanto));
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -88,21 +108,6 @@ a:hover { color: var(--blu-scuro); }
 .su-scuro .b2:hover { background: var(--su-scuro); color: var(--ardesia); }
 .su-scuro .b1 { background: var(--su-scuro); border-color: var(--su-scuro); color: var(--ardesia); }
 .su-scuro .b1:hover { background: #fff; border-color: #fff; color: var(--ardesia); }
-
-/* Marchio nuovo (Tetti) */
-.mono { height: 1em; width: auto; overflow: hidden; }
-.mono * { fill: none; stroke: currentColor; stroke-linejoin: miter; stroke-miterlimit: 8; }
-.scritta { font-family: var(--fd); text-transform: uppercase; letter-spacing: 0.2em; line-height: 1; white-space: nowrap; }
-/* I due puntini sono rombi colorati. Dentro c'è un punto vero, invisibile, così il testo resta "A.M. Costruzioni"
-   per chi usa lettori di schermo o comandi vocali e per chi copia la scritta. */
-.scritta i { display: inline-block; width: 0.2em; height: 0.2em; margin: 0 0.24em 0 0.04em; overflow: hidden; color: transparent; font-style: normal; transform: translateY(0.03em) rotate(45deg); background: var(--blu); }
-.scritta i + i, .scritta i.r { background: var(--rosso); margin-right: 0.05em; }
-.marchio { display: inline-flex; align-items: flex-end; gap: 0.7em; color: inherit; text-decoration: none; }
-.marchio .mono { font-size: 1.7em; }
-.marchio.colonna { flex-direction: column; align-items: center; gap: 0.5em; }
-.marchio.colonna .mono { font-size: 2.6em; }
-.su-scuro .scritta i { background: var(--blu-chiaro); }
-.su-scuro .scritta i.r { background: var(--rosso-chiaro); }
 
 /* Foto in cornice con cartiglio */
 .foto { margin: 0; min-width: 0; }

@@ -1,7 +1,6 @@
 ---
-// Intestazione: marchio nuovo a sinistra, voci di menu, pulsante Chiama e,
-// in alto a destra, il logo dell'azienda che porta alla Home (scelta del cliente).
-import Marchio from './Marchio.astro';
+// Intestazione: voci di menu a sinistra, pulsante Chiama e, in alto a destra, il logo dell'azienda
+// che porta alla Home. È l'unico marchio del sito (scelta del cliente).
 import logoUrl from '../assets/logo-azienda.svg?url';
 import { menu, sito, telHref } from '../data/sito';
 import { u, senzaRadice } from '../lib/percorsi';
@@ -10,28 +9,26 @@ const qui = senzaRadice(Astro.url.pathname);
 ---
 <header class="testata">
   <div class="contenitore riga">
-    <a class="segno" href={u('/')} aria-label="A.M. Costruzioni, pagina iniziale"><Marchio /></a>
-    <nav class="voci" aria-label="Menu principale">
-      {menu.map((v) => <a href={u(v.href)} aria-current={qui === v.href ? 'page' : undefined}>{v.nome}</a>)}
-    </nav>
-    <a class="b1 chiama" href={tel}>Chiama</a>
-    <a class="logo" href={u('/')} aria-label="Home">
-      <img src={logoUrl} width="106" height="56" alt="Logo A.M. Costruzioni snc" />
-    </a>
     <details class="tendina">
       <summary><span></span><span></span><b>Menu</b></summary>
       <nav aria-label="Menu">
         {menu.map((v) => <a href={u(v.href)}>{v.nome}</a>)}
       </nav>
     </details>
+    <nav class="voci" aria-label="Menu principale">
+      {menu.map((v) => <a href={u(v.href)} aria-current={qui === v.href ? 'page' : undefined}>{v.nome}</a>)}
+    </nav>
+    <a class="b1 chiama" href={tel}>Chiama</a>
+    <a class="logo" href={u('/')} aria-label="A.M. Costruzioni, pagina iniziale">
+      <img src={logoUrl} width="106" height="56" alt="" />
+    </a>
   </div>
 </header>
 
 <style>
   .testata { position: sticky; top: 0; z-index: 40; background: var(--calce); border-bottom: 1px solid var(--linea); }
   .riga { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 30px); min-height: var(--testata); }
-  .segno { display: inline-flex; color: var(--antracite); text-decoration: none; font-size: 0.86rem; }
-  .voci { display: flex; gap: clamp(16px, 2.2vw, 30px); margin-left: auto; font-size: 0.97rem; }
+  .voci { display: flex; gap: clamp(16px, 2.2vw, 30px); margin-right: auto; font-size: 0.97rem; }
   .voci a, .tendina nav a { color: var(--antracite); text-decoration: none; padding-block: 6px; border-bottom: 1px solid transparent; }
   .voci a:hover, .voci a[aria-current="page"] { border-bottom-color: var(--antracite); }
   .chiama { min-height: 42px; padding: 8px 20px; }
@@ -51,9 +48,5 @@ const qui = senzaRadice(Astro.url.pathname);
     .tendina nav { position: absolute; left: 0; right: 0; top: 100%; display: grid; padding: 6px var(--bordo) 18px; background: var(--calce); border-bottom: 1px solid var(--linea); box-shadow: 0 24px 30px -24px rgba(31, 35, 39, 0.35); }
     .tendina nav a { padding: 14px 0; border-bottom: 1px solid var(--linea); font-size: 1.1rem; }
     .tendina nav a:last-child { border-bottom: 0; }
-  }
-  @media (max-width: 560px) {
-    .segno :global(.scritta) { display: none; }
-    .segno { font-size: 1rem; }
   }
 </style>

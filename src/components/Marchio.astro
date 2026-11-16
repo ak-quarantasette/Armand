@@ -1,9 +1,0 @@
----
-// Il marchio nuovo: monogramma AM a linea di tetti e scritta con i due punti blu e rosso.
-interface Props { colonna?: boolean; soloMonogramma?: boolean; etichetta?: string; }
-const { colonna = false, soloMonogramma = false, etichetta = 'A.M. Costruzioni' } = Astro.props;
----
-<span class:list={['marchio', { colonna }]} role="img" aria-label={etichetta}>
-  <svg class="mono" viewBox="-6 -13 164 113" aria-hidden="true"><polyline points="-3.2,110 32,0 64,100 84,0 108,62 132,0 154,110" stroke-width="7"/><line x1="16.5" y1="66" x2="47.5" y2="66" stroke-width="3.6"/></svg>
-  {!soloMonogramma && <span class="scritta" aria-hidden="true">A<i>.</i>M<i class="r">.</i> Costruzioni</span>}
-</span>
