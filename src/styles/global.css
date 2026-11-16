@@ -1,0 +1,142 @@
+/* A.M. Costruzioni: stile del sito.
+   Impaginazione ariosa da rivista, allineata a sinistra: molto bianco, foto in cornice, filetti sottili.
+   I colori vengono dai cantieri (calce, pietra, ardesia) più il blu e il rosso del logo. */
+
+:root {
+  --calce: #F5F4F0;      /* sfondo */
+  --calce-2: #FBFAF8;    /* superfici chiare */
+  --calce-3: #ECEAE4;    /* fasce appena più scure */
+  --antracite: #1F2327;  /* testi */
+  --pietra: #5E656B;     /* testi secondari */
+  --linea: #D4D1C9;      /* filetti */
+  --ardesia: #252C33;    /* fascia scura */
+  --blu: #184898;        /* pulsanti e link */
+  --blu-scuro: #123A7C;
+  --rosso: #902020;      /* piccoli dettagli */
+  --su-scuro: #F5F4F0;
+  --su-scuro-2: #AEB4BA;
+  --blu-chiaro: #8FB2EE;
+  --rosso-chiaro: #E27F74;
+  --fd: 'Marcellus', 'Times New Roman', serif;
+  --ft: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bordo: clamp(20px, 4.5vw, 64px);
+  --larghezza: 1240px;
+  --testata: 76px;
+  --morbido: cubic-bezier(0.22, 0.61, 0.36, 1); /* arrivo lento e morbido */
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--testata) + 16px); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+body {
+  margin: 0;
+  background: var(--calce);
+  color: var(--antracite);
+  font-family: var(--ft);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, picture, svg { display: block; max-width: 100%; }
+img { height: auto; }
+
+h1, h2, h3 { margin: 0; font-family: var(--fd); font-weight: 400; line-height: 1.08; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 6vw, 4.3rem); }
+h2 { font-size: clamp(1.85rem, 3.9vw, 2.9rem); }
+h3 { font-size: clamp(1.3rem, 2.2vw, 1.65rem); line-height: 1.15; }
+p { margin: 0; max-width: 62ch; }
+ul, ol { margin: 0; padding: 0; }
+a { color: var(--blu); text-underline-offset: 0.18em; }
+a:hover { color: var(--blu-scuro); }
+:focus-visible { outline: 2px solid var(--blu); outline-offset: 3px; }
+
+.salta { position: absolute; left: 12px; top: -80px; z-index: 60; padding: 10px 16px; background: var(--antracite); color: var(--calce); }
+.salta:focus { top: 12px; color: var(--calce); }
+
+.contenitore { width: 100%; max-width: calc(var(--larghezza) + 2 * var(--bordo)); margin-inline: auto; padding-inline: var(--bordo); }
+.sezione { padding-block: clamp(60px, 9vw, 132px); }
+.sezione + .sezione { border-top: 1px solid var(--linea); }
+.fascia { background: var(--calce-3); border-top: 0 !important; }
+.fascia + .sezione { border-top: 0; }
+.tenue { color: var(--pietra); }
+.grande { font-family: var(--fd); font-size: clamp(1.45rem, 3vw, 2.25rem); line-height: 1.25; max-width: 28ch; text-wrap: balance; }
+.pila { display: grid; gap: 22px; align-content: start; justify-items: start; }
+.pila > * { min-width: 0; }
+
+/* Pulsanti */
+.b1, .b2 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 24px;
+  font: 500 1rem/1.25 var(--ft);
+  text-decoration: none;
+  border: 1px solid var(--blu);
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.b1 { background: var(--blu); color: #fff; }
+.b1:hover { background: var(--blu-scuro); border-color: var(--blu-scuro); color: #fff; }
+.b2 { color: var(--antracite); border-color: var(--antracite); }
+.b2:hover { background: var(--antracite); color: var(--calce); }
+.azioni { display: flex; flex-wrap: wrap; gap: 10px; }
+.su-scuro .b2 { color: var(--su-scuro); border-color: var(--su-scuro); }
+.su-scuro .b2:hover { background: var(--su-scuro); color: var(--ardesia); }
+.su-scuro .b1 { background: var(--su-scuro); border-color: var(--su-scuro); color: var(--ardesia); }
+.su-scuro .b1:hover { background: #fff; border-color: #fff; color: var(--ardesia); }
+
+/* Marchio nuovo (Tetti) */
+.mono { height: 1em; width: auto; overflow: hidden; }
+.mono * { fill: none; stroke: currentColor; stroke-linejoin: miter; stroke-miterlimit: 8; }
+.scritta { font-family: var(--fd); text-transform: uppercase; letter-spacing: 0.2em; line-height: 1; white-space: nowrap; }
+/* I due puntini sono rombi colorati. Dentro c'è un punto vero, invisibile, così il testo resta "A.M. Costruzioni"
+   per chi usa lettori di schermo o comandi vocali e per chi copia la scritta. */
+.scritta i { display: inline-block; width: 0.2em; height: 0.2em; margin: 0 0.24em 0 0.04em; overflow: hidden; color: transparent; font-style: normal; transform: translateY(0.03em) rotate(45deg); background: var(--blu); }
+.scritta i + i, .scritta i.r { background: var(--rosso); margin-right: 0.05em; }
+.marchio { display: inline-flex; align-items: flex-end; gap: 0.7em; color: inherit; text-decoration: none; }
+.marchio .mono { font-size: 1.7em; }
+.marchio.colonna { flex-direction: column; align-items: center; gap: 0.5em; }
+.marchio.colonna .mono { font-size: 2.6em; }
+.su-scuro .scritta i { background: var(--blu-chiaro); }
+.su-scuro .scritta i.r { background: var(--rosso-chiaro); }
+
+/* Foto in cornice con cartiglio */
+.foto { margin: 0; min-width: 0; }
+.foto img { width: 100%; background: var(--calce-3); }
+.cartiglio { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 18px; margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--antracite); font-size: 0.88rem; line-height: 1.5; }
+.cartiglio dt { color: var(--pietra); }
+.cartiglio dd { margin: 0; }
+
+/* Testi lunghi */
+.prosa { display: grid; gap: 18px; align-content: start; }
+.prosa > * { min-width: 0; }
+.prosa ul, .prosa ol { display: grid; gap: 8px; padding-left: 1.2em; max-width: 60ch; }
+.elenco, .prosa ul.elenco { list-style: none; display: grid; gap: 0; max-width: 46rem; padding-left: 0; }
+.elenco li { padding: 13px 0; border-top: 1px solid var(--linea); }
+.elenco li:last-child { border-bottom: 1px solid var(--linea); }
+
+/* Comparsa lenta mentre si scorre: i titoli salgono da dietro una maschera, foto e passi compaiono con calma.
+   La classe "moto" la mette lo script in testa alla pagina (Base.astro) solo se il browser può farlo e
+   l'utente non ha chiesto meno movimento; "visto" arriva quando l'elemento entra nello schermo.
+   Senza JavaScript non c'è nessuna delle due classi e tutto è visibile da subito. */
+.moto .entra { opacity: 0; transform: translateY(40px); transition: opacity 1.2s var(--morbido), transform 1.2s var(--morbido); transition-delay: calc(var(--i, 0) * 110ms); }
+.moto .entra.visto { opacity: 1; transform: none; }
+.moto .maschera { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.moto .maschera > span { display: block; transform: translateY(108%); transition: transform 1.2s var(--morbido); }
+.moto .maschera.visto > span { transform: none; }
+@media print {
+  .moto .entra, .moto .maschera > span { opacity: 1; transform: none; transition: none; }
+}
+
+/* Fino a 900 px l'intestazione non ha il pulsante Chiama: lo sostituisce la barra fissa in basso (Base.astro). */
+@media (max-width: 900px) {
+  html { scroll-padding-bottom: 76px; } /* chi naviga con la tastiera non finisce sotto la barra */
+  body { padding-bottom: 60px; } /* spazio per la barra Chiama / WhatsApp */
+}
+@media (max-width: 780px) {
+  :root { --testata: 64px; }
+}

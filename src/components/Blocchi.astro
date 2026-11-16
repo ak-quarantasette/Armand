@@ -1,0 +1,11 @@
+---
+// Mostra paragrafi ed elenchi letti dai testi.
+import type { Blocco } from '../lib/testi';
+interface Props { blocchi: Blocco[]; elenco?: boolean; }
+const { blocchi, elenco = false } = Astro.props;
+---
+{blocchi.map((b) =>
+  b.tipo === 'p' ? <p set:html={b.html} />
+  : b.tipo === 'ul' ? <ul class:list={[{ elenco }]}>{b.voci.map((v) => <li set:html={v} />)}</ul>
+  : <ol>{b.voci.map((v) => <li set:html={v} />)}</ol>
+)}

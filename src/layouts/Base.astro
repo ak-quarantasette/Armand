@@ -1,0 +1,125 @@
+---
+// Struttura comune a tutte le pagine: testa (titolo, descrizione, dati per Google), intestazione, piede, apertura.
+import '@fontsource/marcellus/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-500.css';
+import '@fontsource/ibm-plex-sans/latin-600.css';
+import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import Intestazione from '../components/Intestazione.astro';
+import Piede from '../components/Piede.astro';
+import Apertura from '../components/Apertura.astro';
+import { sito, zone, telHref, waHref } from '../data/sito';
+import { foto } from '../data/foto';
+import { u } from '../lib/percorsi';
+
+interface Props { titolo: string; descrizione: string; indicizza?: boolean; }
+const { titolo, descrizione, indicizza = true } = Astro.props;
+// Gli indirizzi completi si possono scrivere solo quando si sa dove sta il sito (dominio o anteprima nota).
+const assoluto = (percorso: string) => (sito.origine ? new URL(percorso, sito.origine).href : '');
+const canonico = assoluto(Astro.url.pathname);
+const copertina = await getImage({ src: foto('facciata-dopo'), width: 1200, height: 630, format: 'jpg', fit: 'cover' });
+const copertinaUrl = assoluto(copertina.src) || copertina.src;
+const tel = telHref(sito.tel1) || u('/contatti/');
+const wa = waHref() || u('/contatti/');
+
+const scheda = {
+  '@context': 'https://schema.org',
+  '@type': 'GeneralContractor',
+  name: sito.nome,
+  ...(sito.origine ? { url: assoluto(u('/')), image: copertinaUrl } : {}),
+  foundingDate: String(sito.dal),
+  ...(sito.tel1 ? { telephone: sito.tel1 } : {}),
+  ...(sito.email ? { email: sito.email } : {}),
+  ...(sito.piva ? { vatID: 'IT' + sito.piva } : {}),
+  address: { '@type': 'PostalAddress', addressLocality: sito.comune, addressRegion: sito.provincia, postalCode: sito.cap, addressCountry: 'IT' },
+  areaServed: [sito.comune, ...zone].map((n) => ({ '@type': 'City', name: n })),
+};
+---
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titolo}</title>
+    <meta name="description" content={descrizione} />
+    {/* In anteprima (dominio non ancora scritto in astro.config.mjs) nessuna pagina va su Google. */}
+    {!sito.anteprima && <link rel="canonical" href={canonico} />}
+    {(!indicizza || sito.anteprima) && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#F5F4F0" />
+    <link rel="icon" href={u('/favicon.svg')} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:site_name" content={sito.nome} />
+    <meta property="og:title" content={titolo} />
+    <meta property="og:description" content={descrizione} />
+    {canonico && <meta property="og:url" content={canonico} />}
+    <meta property="og:image" content={copertinaUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json" set:html={JSON.stringify(scheda)} />
+    <script is:inline>
+      // Comparsa lenta mentre si scorre: "moto" su <html> accende gli effetti (vedi global.css),
+      // poi ogni titolo, foto o passo riceve "visto" quando entra nello schermo. Se qualcosa va storto
+      // "moto" viene tolta e tutto resta visibile.
+      (function () {
+        var d = document.documentElement;
+        try {
+          if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          d.classList.add('moto');
+          document.addEventListener('DOMContentLoaded', function () {
+            try {
+              var io = new IntersectionObserver(function (voci) {
+                voci.forEach(function (v) {
+                  var soglia = v.target.classList.contains('maschera') ? 0.6 : 0.12;
+                  // chi sta sopra lo schermo (pagina aperta a metà) è già passato: si mostra senza aspettare
+                  if (v.intersectionRatio >= soglia || v.boundingClientRect.bottom < 0) { v.target.classList.add('visto'); io.unobserve(v.target); }
+                });
+              }, { threshold: [0.12, 0.6] });
+              document.querySelectorAll('.entra, .maschera').forEach(function (e) { io.observe(e); });
+            } catch (e) { d.classList.remove('moto'); }
+          });
+        } catch (e) { d.classList.remove('moto'); }
+      })();
+    </script>
+    <script is:inline>
+      // Decide subito, prima che la pagina compaia, se mostrare l'apertura: una volta per visita,
+      // mai se l'utente ha chiesto meno movimento. Su computer (mouse) parte il muro di mattoni.
+      (function () {
+        try {
+          var d = document.documentElement, s = sessionStorage;
+          if (s.getItem('am-apertura') || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          s.setItem('am-apertura', '1');
+          var pc = matchMedia('(hover: hover) and (pointer: fine)').matches && innerWidth >= 900;
+          d.classList.add('apertura', pc ? 'apertura-pc' : 'apertura-tel');
+          var togli = function () { d.classList.remove('apertura', 'apertura-pc', 'apertura-tel', 'apertura-apri'); };
+          if (!pc) { setTimeout(togli, 2700); return; }
+          // se il muro non parte entro 4 secondi si apre comunque; in ogni caso mai oltre 16
+          setTimeout(function () { if (!window.amMuroPartito && d.classList.contains('apertura-pc')) { d.classList.add('apertura-apri'); setTimeout(togli, 1000); } }, 4000);
+          setTimeout(togli, 16000);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="salta" href="#contenuto">Vai al contenuto</a>
+    <Intestazione />
+    <main id="contenuto">
+      <slot />
+    </main>
+    <Piede />
+    <nav class="barra" aria-label="Contatti rapidi">
+      <a href={tel}>Chiama</a>
+      <a href={wa} rel={wa.startsWith('http') ? 'noopener' : undefined}>WhatsApp</a>
+    </nav>
+    <Apertura />
+  </body>
+</html>
+
+<style>
+  .barra { display: none; }
+  @media (max-width: 900px) {
+    .barra { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: grid; grid-template-columns: 1fr 1fr; padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--ardesia); }
+    .barra a { display: grid; place-items: center; min-height: 60px; font-weight: 500; color: var(--su-scuro); text-decoration: none; }
+    .barra a:first-child { background: var(--blu); color: #fff; }
+  }
+</style>

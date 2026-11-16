@@ -1,0 +1,11 @@
+---
+// I due pulsanti principali: chiamata e WhatsApp. Se un numero viene tolto dai dati, portano alla pagina Contatti.
+import { sito, telHref, waHref } from '../data/sito';
+import { u } from '../lib/percorsi';
+const tel = telHref(sito.tel1) || u('/contatti/');
+const wa = waHref() || u('/contatti/');
+---
+<div class="azioni">
+  <a class="b1" href={tel}>Chiama</a>
+  <a class="b2" href={wa} rel={wa.startsWith('http') ? 'noopener' : undefined}>Scrivi su WhatsApp</a>
+</div>

@@ -1,0 +1,65 @@
+name: Anteprima su GitHub Pages
+
+# Pubblica il sito su GitHub Pages (https://<utente>.github.io/<repo>/) a ogni modifica di main.
+# Per accenderla: Settings → Pages → Source → "GitHub Actions". Finché Pages è spento,
+# questo flusso controlla soltanto che il sito si costruisca, senza pubblicare nulla.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  costruisci:
+    name: Costruisce il sito
+    runs-on: ubuntu-latest
+    outputs:
+      pages: ${{ steps.pages.outputs.attivo }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Controlla se GitHub Pages è acceso
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if stato=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq .build_type 2>&1); then
+            if [ "$stato" = "workflow" ]; then
+              echo "attivo=si" >> "$GITHUB_OUTPUT"
+            else
+              echo "::warning::GitHub Pages è acceso ma con un'altra sorgente ($stato). Scegli \"GitHub Actions\" in Settings → Pages → Source."
+            fi
+          elif echo "$stato" | grep -q "HTTP 404"; then
+            echo "::notice::GitHub Pages è spento: il sito viene solo costruito. Per pubblicare l'anteprima: Settings → Pages → Source → GitHub Actions."
+          else
+            echo "::error::Non riesco a leggere lo stato di GitHub Pages: $stato"
+            exit 1
+          fi
+
+      # Installa, costruisce e prepara la cartella dist/ per Pages.
+      # Il sito va in una sottocartella con il nome della repo, e resta fuori da Google (è un'anteprima).
+      - uses: withastro/action@v6
+        env:
+          SITO_BASE: /${{ github.event.repository.name }}
+          ANTEPRIMA_URL: https://${{ github.repository_owner }}.github.io
+
+  pubblica:
+    name: Pubblica l'anteprima
+    needs: costruisci
+    if: needs.costruisci.outputs.pages == 'si' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

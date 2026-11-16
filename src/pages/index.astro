@@ -1,0 +1,147 @@
+---
+import Base from '../layouts/Base.astro';
+import Azioni from '../components/Azioni.astro';
+import Blocchi from '../components/Blocchi.astro';
+import Foto from '../components/Foto.astro';
+import Guida from '../components/Guida.astro';
+import { pagina, sezione } from '../lib/testi';
+import { lavori } from '../data/foto';
+import { servizi } from '../data/sito';
+import { u } from '../lib/percorsi';
+
+const p = pagina('home');
+const grezzo = sezione(p, 'Dal grezzo al finito, un cantiere alla volta');
+const primaDopo = sezione(p, 'Prima e dopo');
+const serv = sezione(p, 'I nostri servizi');
+const come = sezione(p, 'Come lavoriamo');
+const dove = sezione(p, 'Dove lavoriamo');
+const invito = sezione(p, 'Hai un lavoro in mente?');
+const passi = come.blocchi.find((b) => b.tipo === 'ol');
+const pl = pagina('lavori');
+const scelti = ['soggiorno', 'bagno-doccia', 'cucina-soggiorno', 'scala-in-legno'];
+const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
+---
+<Base titolo={p.titolo} descrizione={p.descrizione}>
+  {/* Il "racconto": tutte le sezioni chiare. La guida a sinistra misura lo scorrimento di questo blocco. */}
+  <div class="racconto">
+  <Guida />
+
+  <section class="apertura-pagina contenitore">
+    <div class="pila testo">
+      <h1>{p.h1}</h1>
+      <Blocchi blocchi={p.intro} />
+      <Azioni />
+    </div>
+    <Foto nome="facciata-dopo" subito sizes="(min-width: 900px) 52vw, 92vw" proporzione="4 / 3" voci={[['Lavoro', 'Facciata, dopo i lavori'], ['Dove', "Fara Gera d'Adda"]]} />
+  </section>
+
+  <section class="sezione">
+    <div class="contenitore due">
+      <h2 class="maschera"><span>{grezzo.titolo}</span></h2>
+      <div class="pila"><Blocchi blocchi={grezzo.blocchi} /></div>
+    </div>
+    <div class="contenitore prima-dopo">
+      <Foto nome="facciata-prima" classe="prima entra" sizes="(min-width: 900px) 30vw, 60vw" voci={[['Stato', 'Prima']]} />
+      <Foto nome="facciata-dopo" classe="dopo entra" sizes="(min-width: 900px) 56vw, 92vw" voci={[['Stato', 'Dopo']]} />
+      <p class="tenue nota">{primaDopo.blocchi[0]?.tipo === 'p' && <Fragment set:html={primaDopo.blocchi[0].html} />}</p>
+    </div>
+  </section>
+
+  <section class="sezione fascia" id="servizi">
+    <div class="contenitore">
+      <h2 class="maschera"><span>{serv.titolo}</span></h2>
+      <ul class="servizi">
+        {serv.sotto.map((s, i) => (
+          <li>
+            <a href={u(`/${servizi[i].slug}/`)}>
+              <h3>{s.titolo}</h3>
+              <div class="pila"><Blocchi blocchi={s.blocchi} /></div>
+              <span class="vai" aria-hidden="true">Scopri</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="sezione">
+    <div class="contenitore due">
+      <h2 class="maschera"><span>{pl.h1}</span></h2>
+      <div class="pila"><Blocchi blocchi={pl.intro} /><a class="b2" href={u('/lavori/')}>Tutti i lavori</a></div>
+    </div>
+    <div class="contenitore sfalsata">
+      {vetrina.map((l) => (
+        <Foto nome={l.foto[0]} classe="entra" sizes="(min-width: 900px) 44vw, 92vw" voci={[['Lavoro', l.titolo]]} />
+      ))}
+    </div>
+  </section>
+
+  <section class="sezione fascia">
+    <div class="contenitore">
+      <h2 class="maschera"><span>{come.titolo}</span></h2>
+      {passi && passi.tipo === 'ol' && (
+        <ol class="passi">
+          {passi.voci.map((v, i) => <li class="entra" style={`--i:${i}`} set:html={v} />)}
+        </ol>
+      )}
+    </div>
+  </section>
+
+  <section class="sezione">
+    <div class="contenitore due">
+      <h2 class="maschera"><span>{dove.titolo}</span></h2>
+      <div class="pila"><Blocchi blocchi={dove.blocchi} /></div>
+    </div>
+  </section>
+
+  </div>
+
+  <section class="invito su-scuro">
+    <div class="contenitore pila">
+      <h2>{invito.titolo}</h2>
+      <Blocchi blocchi={invito.blocchi} />
+      <Azioni />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .racconto { view-timeline-name: --racconto; view-timeline-axis: block; }
+  .apertura-pagina { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: end; gap: clamp(24px, 4.5vw, 72px); padding-block: clamp(32px, 6vw, 84px) clamp(56px, 8vw, 110px); }
+  .testo { gap: 26px; }
+  .due { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(20px, 4.5vw, 72px); align-items: start; }
+  .due :global(p) { font-size: 1.12rem; }
+
+  .prima-dopo { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(16px, 3vw, 40px); align-items: end; margin-top: clamp(40px, 6vw, 88px); }
+  .prima-dopo :global(.prima) { margin-bottom: clamp(0px, 5vw, 72px); }
+  .nota { grid-column: 1 / -1; font-size: 0.95rem; }
+
+  .servizi { list-style: none; margin-top: clamp(28px, 4vw, 52px); border-top: 1px solid var(--antracite); }
+  .servizi a { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) auto; gap: 12px clamp(20px, 4.5vw, 72px); align-items: baseline; padding: clamp(22px, 3vw, 34px) 0; border-bottom: 1px solid var(--linea); color: var(--antracite); text-decoration: none; }
+  .servizi li:last-child a { border-bottom-color: var(--antracite); }
+  .servizi .vai { color: var(--blu); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
+  .servizi a:hover h3 { color: var(--blu); }
+
+  .sfalsata { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(36px, 6vw, 96px) clamp(18px, 3.5vw, 48px); align-items: start; margin-top: clamp(40px, 6vw, 88px); }
+  .sfalsata :global(.foto:nth-child(even)) { margin-top: clamp(40px, 9vw, 140px); }
+
+  .passi { list-style: none; counter-reset: passo; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px clamp(20px, 3vw, 44px); margin-top: clamp(28px, 4vw, 52px); }
+  .passi li { counter-increment: passo; padding-top: 16px; border-top: 1px solid var(--antracite); }
+  .passi li::before { content: counter(passo); display: block; font-family: var(--fd); font-size: 2.4rem; line-height: 1; margin-bottom: 14px; color: var(--blu); }
+  .passi :global(strong) { display: block; font-weight: 600; margin-bottom: 4px; }
+
+  .invito { background: var(--ardesia); color: var(--su-scuro); padding-block: clamp(60px, 9vw, 120px); }
+  .invito :global(p) { font-size: 1.15rem; color: var(--su-scuro-2); }
+
+  @media (max-width: 900px) {
+    .apertura-pagina, .due { grid-template-columns: minmax(0, 1fr); }
+    .servizi a { grid-template-columns: minmax(0, 1fr); }
+    .passi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .sfalsata, .prima-dopo { grid-template-columns: minmax(0, 1fr); }
+    .sfalsata :global(.foto:nth-child(even)) { margin-top: 0; }
+    .prima-dopo :global(.prima) { margin-bottom: 0; max-width: 70%; }
+    .passi { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

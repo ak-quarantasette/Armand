@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { u } from '../lib/percorsi';
+---
+<Base titolo="Pagina non trovata | A.M. Costruzioni" descrizione="La pagina cercata non esiste." indicizza={false}>
+  <section class="contenitore pila vuota">
+    <h1>Questa pagina non c'è</h1>
+    <p>Può darsi che l'indirizzo sia cambiato. Dalla pagina iniziale si arriva a tutto il resto.</p>
+    <a class="b1" href={u('/')}>Vai alla pagina iniziale</a>
+  </section>
+</Base>
+
+<style>
+  .vuota { padding-block: clamp(64px, 12vw, 180px); }
+</style>
