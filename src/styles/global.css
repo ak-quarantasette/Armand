@@ -22,12 +22,14 @@
   --bordo: clamp(20px, 4.5vw, 64px);
   --larghezza: 1240px;
   --testata: 76px;
+  --morbido: cubic-bezier(0.22, 0.61, 0.36, 1); /* arrivo lento e morbido */
   color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: calc(var(--testata) + 16px); }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--testata) + 16px); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 
 body {
   margin: 0;
@@ -91,8 +93,10 @@ a:hover { color: var(--blu-scuro); }
 .mono { height: 1em; width: auto; overflow: hidden; }
 .mono * { fill: none; stroke: currentColor; stroke-linejoin: miter; stroke-miterlimit: 8; }
 .scritta { font-family: var(--fd); text-transform: uppercase; letter-spacing: 0.2em; line-height: 1; white-space: nowrap; }
-.scritta i { display: inline-block; width: 0.2em; height: 0.2em; margin: 0 0.24em 0 0.04em; transform: translateY(0.03em) rotate(45deg); background: var(--blu); }
-.scritta i + i, .scritta i.r { background: var(--rosso); margin-right: 0.5em; }
+/* I due puntini sono rombi colorati. Dentro c'è un punto vero, invisibile, così il testo resta "A.M. Costruzioni"
+   per chi usa lettori di schermo o comandi vocali e per chi copia la scritta. */
+.scritta i { display: inline-block; width: 0.2em; height: 0.2em; margin: 0 0.24em 0 0.04em; overflow: hidden; color: transparent; font-style: normal; transform: translateY(0.03em) rotate(45deg); background: var(--blu); }
+.scritta i + i, .scritta i.r { background: var(--rosso); margin-right: 0.05em; }
 .marchio { display: inline-flex; align-items: flex-end; gap: 0.7em; color: inherit; text-decoration: none; }
 .marchio .mono { font-size: 1.7em; }
 .marchio.colonna { flex-direction: column; align-items: center; gap: 0.5em; }
@@ -115,18 +119,24 @@ a:hover { color: var(--blu-scuro); }
 .elenco li { padding: 13px 0; border-top: 1px solid var(--linea); }
 .elenco li:last-child { border-bottom: 1px solid var(--linea); }
 
-/* Comparsa lenta mentre si scorre: solo dove il browser la gestisce da sé e se l'utente non ha chiesto meno movimento. */
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .entra { animation: entra linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
-    .maschera { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
-    .maschera > span { display: block; animation: sale linear both; animation-timeline: view(); animation-range: entry 10% entry 90%; }
-  }
+/* Comparsa lenta mentre si scorre: i titoli salgono da dietro una maschera, foto e passi compaiono con calma.
+   La classe "moto" la mette lo script in testa alla pagina (Base.astro) solo se il browser può farlo e
+   l'utente non ha chiesto meno movimento; "visto" arriva quando l'elemento entra nello schermo.
+   Senza JavaScript non c'è nessuna delle due classi e tutto è visibile da subito. */
+.moto .entra { opacity: 0; transform: translateY(40px); transition: opacity 1.2s var(--morbido), transform 1.2s var(--morbido); transition-delay: calc(var(--i, 0) * 110ms); }
+.moto .entra.visto { opacity: 1; transform: none; }
+.moto .maschera { display: block; overflow: hidden; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.moto .maschera > span { display: block; transform: translateY(108%); transition: transform 1.2s var(--morbido); }
+.moto .maschera.visto > span { transform: none; }
+@media print {
+  .moto .entra, .moto .maschera > span { opacity: 1; transform: none; transition: none; }
 }
-@keyframes entra { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: none; } }
-@keyframes sale { from { transform: translateY(108%); } to { transform: none; } }
 
+/* Fino a 900 px l'intestazione non ha il pulsante Chiama: lo sostituisce la barra fissa in basso (Base.astro). */
+@media (max-width: 900px) {
+  html { scroll-padding-bottom: 76px; } /* chi naviga con la tastiera non finisce sotto la barra */
+  body { padding-bottom: 60px; } /* spazio per la barra Chiama / WhatsApp */
+}
 @media (max-width: 780px) {
   :root { --testata: 64px; }
-  body { padding-bottom: 60px; } /* spazio per la barra Chiama / WhatsApp */
 }

@@ -58,6 +58,30 @@ const scheda = {
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(scheda)} />
     <script is:inline>
+      // Comparsa lenta mentre si scorre: "moto" su <html> accende gli effetti (vedi global.css),
+      // poi ogni titolo, foto o passo riceve "visto" quando entra nello schermo. Se qualcosa va storto
+      // "moto" viene tolta e tutto resta visibile.
+      (function () {
+        var d = document.documentElement;
+        try {
+          if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+          d.classList.add('moto');
+          document.addEventListener('DOMContentLoaded', function () {
+            try {
+              var io = new IntersectionObserver(function (voci) {
+                voci.forEach(function (v) {
+                  var soglia = v.target.classList.contains('maschera') ? 0.6 : 0.12;
+                  // chi sta sopra lo schermo (pagina aperta a metà) è già passato: si mostra senza aspettare
+                  if (v.intersectionRatio >= soglia || v.boundingClientRect.bottom < 0) { v.target.classList.add('visto'); io.unobserve(v.target); }
+                });
+              }, { threshold: [0.12, 0.6] });
+              document.querySelectorAll('.entra, .maschera').forEach(function (e) { io.observe(e); });
+            } catch (e) { d.classList.remove('moto'); }
+          });
+        } catch (e) { d.classList.remove('moto'); }
+      })();
+    </script>
+    <script is:inline>
       // Decide subito, prima che la pagina compaia, se mostrare l'apertura: una volta per visita,
       // mai se l'utente ha chiesto meno movimento. Su computer (mouse) parte il muro di mattoni.
       (function () {
@@ -93,7 +117,7 @@ const scheda = {
 
 <style>
   .barra { display: none; }
-  @media (max-width: 780px) {
+  @media (max-width: 900px) {
     .barra { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: grid; grid-template-columns: 1fr 1fr; padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--ardesia); }
     .barra a { display: grid; place-items: center; min-height: 60px; font-weight: 500; color: var(--su-scuro); text-decoration: none; }
     .barra a:first-child { background: var(--blu); color: #fff; }

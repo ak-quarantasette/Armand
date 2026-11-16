@@ -15,7 +15,11 @@ const scappa = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').rep
 export function riga(t: string): string {
   return scappa(t)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\{\{(.+?)\}\}/g, (_, k: string) => scappa(segnaposto[k.trim()] || '—'));
+    // se il dato finisce già con un punto (ragione sociale "… e C.") e subito dopo c'è il punto della frase, ne resta uno
+    .replace(/\{\{(.+?)\}\}(\.?)/g, (_, k: string, punto: string) => {
+      const valore = segnaposto[k.trim()] || '—';
+      return scappa(valore) + (punto && valore.endsWith('.') ? '' : punto);
+    });
 }
 
 export function pagina(nome: string): Pagina {

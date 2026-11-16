@@ -215,7 +215,7 @@ export async function avvia(canvas) {
 
       if (fase === 'gioco') {
         let attivo = false;
-        if (ora - fermo > 1600) { // nessuno muove il mouse: una mano invisibile smonta al posto suo
+        if (ora - fermo > 1000) { // nessuno muove il mouse: una mano invisibile smonta al posto suo
           if (!mano) { mano = true; const g0 = manoPos(gu); cur.x = cur.px = g0.x; cur.y = cur.py = g0.y; }
           gu += dt * 1.7;
           const g = manoPos(gu);
@@ -225,7 +225,9 @@ export async function avvia(canvas) {
         cur.vx = (cur.x - cur.px) / dt; cur.vy = (cur.y - cur.py) / dt;
         if (attivo) spazzola(ora);
         if (!mano) { cur.px = cur.x; cur.py = cur.y; }
-        if (via >= B.length * 0.58 || ora - gioco > 7500) crolla(ora);
+        // Durata: se nessuno tocca il mouse il muro crolla dopo 3 secondi, così tutta l'apertura sta in circa 8;
+        // finché il visitatore gioca si va avanti, al massimo fino a 7,5 secondi.
+        if (via >= B.length * 0.58 || ora - gioco > (ora - fermo < 1200 ? 7500 : 3000)) crolla(ora);
       }
 
       let restano = 0;

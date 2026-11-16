@@ -2,7 +2,8 @@
 import type { ImageMetadata } from 'astro';
 import { pagina, sezione } from '../lib/testi';
 
-const file = import.meta.glob('../../materiali/originali/*.{jpg,avif}', { eager: true, import: 'default' }) as Record<string, ImageMetadata>;
+// tutte le foto tranne il vecchio logo, che non compare in nessuna pagina
+const file = import.meta.glob(['../../materiali/originali/*.{jpg,avif}', '!**/logo-*'], { eager: true, import: 'default' }) as Record<string, ImageMetadata>;
 
 export const foto = (nome: string): ImageMetadata => {
   const chiave = Object.keys(file).find((k) => k.replace(/^.*\//, '').replace(/\.\w+$/, '') === nome);

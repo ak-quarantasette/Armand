@@ -22,6 +22,8 @@ const scelti = ['soggiorno', 'bagno-doccia', 'cucina-soggiorno', 'scala-in-legno
 const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
 ---
 <Base titolo={p.titolo} descrizione={p.descrizione}>
+  {/* Il "racconto": tutte le sezioni chiare. La guida a sinistra misura lo scorrimento di questo blocco. */}
+  <div class="racconto">
   <Guida />
 
   <section class="apertura-pagina contenitore">
@@ -79,7 +81,7 @@ const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
       <h2 class="maschera"><span>{come.titolo}</span></h2>
       {passi && passi.tipo === 'ol' && (
         <ol class="passi">
-          {passi.voci.map((v) => <li set:html={v} />)}
+          {passi.voci.map((v, i) => <li class="entra" style={`--i:${i}`} set:html={v} />)}
         </ol>
       )}
     </div>
@@ -92,6 +94,8 @@ const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
     </div>
   </section>
 
+  </div>
+
   <section class="invito su-scuro">
     <div class="contenitore pila">
       <h2>{invito.titolo}</h2>
@@ -102,6 +106,7 @@ const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
 </Base>
 
 <style>
+  .racconto { view-timeline-name: --racconto; view-timeline-axis: block; }
   .apertura-pagina { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: end; gap: clamp(24px, 4.5vw, 72px); padding-block: clamp(32px, 6vw, 84px) clamp(56px, 8vw, 110px); }
   .testo { gap: 26px; }
   .due { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(20px, 4.5vw, 72px); align-items: start; }

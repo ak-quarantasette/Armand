@@ -1,23 +1,56 @@
 ---
-// Guida verticale a sinistra, solo su schermi larghi: mentre si scorre la pagina il segno scende,
-// dal sopralluogo alla consegna. Si appoggia a una funzione dei browser recenti; dove manca, non compare.
+// Guida verticale a sinistra, solo su computer: racconta il cantiere mentre si scorre la home.
+// Il segno blu scende dal sopralluogo alla consegna e la tappa in corso si scurisce.
+// Va messa come primo elemento dentro il contenitore ".racconto" (vedi index.astro): resta ferma a metà
+// schermo finché si scorrono le sezioni chiare e se ne va con loro prima della fascia scura dei contatti.
+// Usa una funzione dei browser recenti (animazioni legate allo scorrimento); dove manca, non compare.
 const tappe = ['Sopralluogo', 'Preventivo', 'Cantiere', 'Consegna'];
 ---
-<div class="guida" aria-hidden="true">
-  <span class="filo"><i></i></span>
-  <ul>{tappe.map((t) => <li>{t}</li>)}</ul>
+<div class="ancora" aria-hidden="true">
+  <div class="guida">
+    <span class="filo"><i></i></span>
+    <ul>{tappe.map((t) => <li>{t}</li>)}</ul>
+  </div>
 </div>
 
 <style>
-  .guida { display: none; }
-  @media (min-width: 1500px) and (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: scroll()) {
-      .guida { position: fixed; left: 26px; top: 50%; z-index: 5; display: grid; grid-template-columns: 9px auto; gap: 12px; height: 228px; margin-top: -114px; color: var(--pietra); font-size: 0.72rem; letter-spacing: 0.04em; }
+  .ancora { display: none; }
+
+  /* ATTENZIONE: per le animazioni si usano apposta le proprietà lunghe (animation-name, ...).
+     Scrivendo "animation: ..." il minificatore la fonde con animation-timeline in una forma che i browser
+     scartano, e nel sito costruito il movimento sparisce senza errori. */
+  @media (min-width: 1200px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
+    @supports (view-timeline-name: --racconto) {
+      /* l'ancora non occupa spazio: segna il bordo inferiore della guida e si ferma poco sotto metà schermo */
+      .ancora { display: block; position: sticky; top: calc(50vh + var(--alta) / 2 + 28px); z-index: 5; height: 0; pointer-events: none; --alta: 300px; }
+      .guida { position: absolute; left: 16px; bottom: 28px; display: grid; grid-template-columns: 9px auto; gap: 8px; height: var(--alta); color: var(--pietra); font-size: 0.72rem; letter-spacing: 0.04em; }
       .filo { position: relative; justify-self: center; width: 1px; background: var(--linea); }
-      .filo i { position: absolute; left: -4px; top: 0; width: 9px; height: 9px; background: var(--blu); transform: rotate(45deg); animation: scende linear both; animation-timeline: scroll(root); }
-      ul { list-style: none; display: grid; align-content: space-between; }
-      li { line-height: 9px; }
+      .filo i { position: absolute; left: -4px; top: 0; width: 9px; height: 9px; background: var(--blu); transform: rotate(45deg);
+        animation-name: guida-scende; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --racconto; animation-range: contain 0% contain 100%; }
+
+      /* margine stretto: le tappe sono scritte in verticale lungo il filo */
+      ul { list-style: none; display: grid; align-content: space-between; justify-items: center; }
+      li { writing-mode: vertical-rl; transform: rotate(180deg); line-height: 1; white-space: nowrap;
+        animation-name: guida-mezzo; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --racconto; }
+      li:nth-child(1) { animation-name: guida-prima; animation-range: contain 0% contain 19%; }
+      li:nth-child(2) { animation-range: contain 14% contain 53%; }
+      li:nth-child(3) { animation-range: contain 47% contain 86%; }
+      li:nth-child(4) { animation-name: guida-ultima; animation-range: contain 81% contain 100%; }
     }
   }
-  @keyframes scende { to { top: calc(100% - 9px); } }
+
+  /* margine largo: tappe in orizzontale, ciascuna accanto alla sua fermata */
+  @media (min-width: 1500px) and (min-height: 560px) and (prefers-reduced-motion: no-preference) {
+    @supports (view-timeline-name: --racconto) {
+      .ancora { --alta: 228px; }
+      .guida { left: 26px; gap: 12px; }
+      ul { justify-items: start; }
+      li { writing-mode: horizontal-tb; transform: none; line-height: 9px; }
+    }
+  }
+
+  @keyframes guida-scende { to { top: calc(100% - 9px); } }
+  @keyframes guida-prima { 0%, 70% { color: var(--antracite); } 100% { color: var(--pietra); } }
+  @keyframes guida-mezzo { 0%, 100% { color: var(--pietra); } 12%, 88% { color: var(--antracite); } }
+  @keyframes guida-ultima { 0% { color: var(--pietra); } 30%, 100% { color: var(--antracite); } }
 </style>

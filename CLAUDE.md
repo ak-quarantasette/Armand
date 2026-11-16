@@ -6,21 +6,23 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 
 ## Stato (aggiornato 2026-11-16)
 
-- **Fase in corso**: la 3 di 5 è conclusa (sito costruito, prima versione). Restano 4 verifiche e 5 pubblicazione.
-  Fasi 1 e 2 chiuse: caratteri A, marchio 1, logo in alto a destra con i colori attenuati, apertura a mattoni
-  con ombra e spessore, testi approvati (si parla solo di "consulenza gratuita").
-- **Anteprime** (artifact privati dell'utente, fuori dalla repo; si leggono con lo strumento Artifact):
-  - grafica: https://claude.ai/artifact/8Fb5WGHMtMJ6gDYfgVgBQq (primo schermo con il logo dell'azienda in
-    alto e nel piede, scelte confermate, animazione telefono "Il tetto");
-  - animazione computer "La posa": https://claude.ai/artifact/EmAnJNbVSZL4S1vYoGRsTX (p5.js, con parametri;
-    forme: mattoni fotografici, rombi, quadrati);
-  - testi: https://claude.ai/artifact/6gQLwvxVkgP78eZmE5bhvb (versione approvata di tutte le pagine);
-  - schermate del sito costruito: https://claude.ai/artifact/MBtbF8rMkiibHqMq1uv5XL (da rifare se cambia la grafica).
-- **Prossimo passo**: far scegliere all'utente dove pubblicare (fase 5) e fargli provare il sito su iPhone (fase 4).
+- **Fase in corso**: fasi 1-3 chiuse. Fase 4 (verifiche) fatta con Chromium su telefono, tablet e computer;
+  manca solo la prova su iPhone, che fa l'utente. Fase 5 (pubblicazione) predisposta nella repo: restano i
+  passi che può fare solo l'utente (vedi "Pubblicazione").
+- **Scelte già confermate**: caratteri A, marchio 1, logo in alto a destra con i colori attenuati, apertura a
+  mattoni con ombra e spessore, testi approvati (si parla solo di "consulenza gratuita").
+- **Anteprime vecchie** (artifact privati dell'utente; si leggono con lo strumento Artifact). Servono solo come
+  storico, ora fa fede il sito costruito:
+  grafica https://claude.ai/artifact/8Fb5WGHMtMJ6gDYfgVgBQq ·
+  prototipo "La posa" https://claude.ai/artifact/EmAnJNbVSZL4S1vYoGRsTX ·
+  testi https://claude.ai/artifact/6gQLwvxVkgP78eZmE5bhvb ·
+  schermate della prima versione https://claude.ai/artifact/MBtbF8rMkiibHqMq1uv5XL.
+- **Prossimo passo**: l'utente mette online l'anteprima, la guarda da iPhone e da computer e dice cosa cambiare.
 - **In attesa dall'utente**:
-  - dove pubblicare il sito (GitHub Pages o Cloudflare) e, lì, l'inserimento di contatti e dati legali come
-    variabili d'ambiente (vedi "Riservatezza");
-  - commenti sulla prima versione e prova su iPhone.
+  - il via per unire il ramo di lavoro a `main` (serve sia a Cloudflare sia a GitHub Pages);
+  - creare il progetto su Cloudflare oppure accendere GitHub Pages (passi in "Pubblicazione");
+  - commenti sull'anteprima e prova su iPhone;
+  - il dominio (proposte in "Progetto"): quando c'è, va scritto in `astro.config.mjs`.
 
 ## Progetto
 
@@ -62,8 +64,8 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
   legali sono segnaposto `{{...}}`. Niente numeri, certificazioni o recensioni inventati.
 - **Tecnica**: sito statico con Astro 7 (`npm run build` crea `dist/`), quasi zero JavaScript, immagini
   AVIF/WebP, caratteri ospitati sul sito. Lighthouse da telefono misurato sulla home: 98 prestazioni, 100
-  accessibilità, buone pratiche e SEO. Hosting statico gratuito (Cloudflare o GitHub Pages), da decidere alla
-  pubblicazione. I link interni partono da `/`: su GitHub Pages senza dominio va prima gestito il sottopercorso.
+  accessibilità, buone pratiche e SEO (prima versione). Hosting gratuito: Cloudflare per il sito definitivo
+  (scelta dell'utente), GitHub Pages solo come anteprima alternativa. Vedi "Pubblicazione".
 
 ## Animazioni d'apertura
 
@@ -82,8 +84,46 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
   Il prototipo (p5.js, skill `algorithmic-art`) resta come riferimento; nel sito è riscritta in
   `src/scripts/muro.js`, canvas senza librerie, con ombra lontana, ombra vicina e spessore del muro: l'utente ha
   chiesto l'effetto "doppio fondo". Parte solo con `(hover: hover) and (pointer: fine)` e schermo da 900 px in su.
+  Durata misurata: 7-8 secondi se nessuno tocca nulla (dopo 3 secondi di muro finito crolla da solo); finché il
+  visitatore gioca col mouse va avanti, al massimo 7,5 secondi di gioco. Clic, tasto o rotella: crolla subito.
 - **Telefono, "Il tetto"** (automatica, circa 2 secondi): il monogramma si disegna con un tratto solo,
   appare il nome, la schermata si apre a lamelle orizzontali. Solo CSS e SVG.
+
+## Scorrimento (com'è fatto)
+
+- **Comparsa lenta**: titoli con classe `maschera` e foto o blocchi con classe `entra` compaiono in 1,2 secondi
+  quando entrano nello schermo, come nel sito di riferimento (lì 1,4 s, stessa curva morbida). Lo fa un piccolo
+  script in testa a `Base.astro`: mette `moto` su `<html>` e `visto` sugli elementi. Senza JavaScript o con
+  "riduci animazioni" tutto è visibile da subito. Funziona su tutti i browser.
+- **Guida a sinistra** (solo home, da 1200 px di larghezza): il segno blu scende da Sopralluogo a Consegna e la
+  tappa in corso si scurisce. Sotto i 1500 px le tappe sono scritte in verticale nel margine. Sta dentro il
+  blocco `.racconto` di `index.astro` (tutte le sezioni chiare) e se ne va prima della fascia scura.
+  È CSS puro legato allo scorrimento: nei browser che non lo gestiscono non compare.
+- **Trappola già incontrata**: mai scrivere `animation: ...` insieme ad `animation-timeline`. Il compattatore
+  del CSS li fonde in una forma che i browser scartano: in `npm run dev` funziona, nel sito costruito il
+  movimento sparisce senza errori. Usare le proprietà lunghe (`animation-name`, ...), come in `Guida.astro`.
+  Le animazioni vanno sempre controllate sul sito costruito, in movimento, non su schermate ferme.
+- **Non fatto, da proporre all'utente se lo chiede**: lo sfondo che cambia tono in modo graduale come nel
+  riferimento. Oggi le sezioni alternano due toni chiari e chiudono sulla fascia scura.
+
+## Pubblicazione
+
+- **Modalità anteprima**: finché `DOMINIO` in `astro.config.mjs` è vuoto, ogni pagina ha `noindex`, niente
+  indirizzo canonico e niente sitemap. Scrivendo lì il dominio il sito diventa indicizzabile da solo.
+  Non dimenticarlo quando arriva il dominio: è l'unico interruttore.
+- **Cloudflare** (definitivo): `wrangler.jsonc` pubblica `dist/` come sito statico su Workers, con pagina 404.
+  Nella dashboard: Workers & Pages → Create application → Import a repository → repo `Armand`, nome progetto
+  `armand` (uguale a `wrangler.jsonc`, altrimenti la costruzione fallisce), build `npm run build`, deploy
+  `npx wrangler deploy`. Indirizzo gratuito `armand.<account>.workers.dev`. `public/_headers` tiene
+  `workers.dev` e `pages.dev` fuori da Google e dà memoria lunga ai file in `/_astro/`. Per il dominio vero i
+  nameserver devono essere quelli di Cloudflare. Se un giorno l'indirizzo `workers.dev` diventasse quello
+  definitivo, va tolta la sua regola da `_headers`.
+- **GitHub Pages** (anteprima senza nuovi account): `.github/workflows/anteprima-github-pages.yml` costruisce
+  il sito nella sottocartella `/Armand/` e lo pubblica da `main` su https://ak-quarantasette.github.io/Armand/
+  solo se Pages è acceso con sorgente "GitHub Actions" (Settings → Pages); altrimenti controlla soltanto che il
+  sito si costruisca. Provato sui server di GitHub: costruzione riuscita in circa un minuto.
+- **Quando arriva il dominio**: scriverlo in `DOMINIO`, collegarlo su Cloudflare, poi Search Console, scheda
+  Google Business Profile e cancellazione della vecchia pagina Jimdo.
 
 ## Riservatezza (richiesta esplicita dell'utente)
 
@@ -123,7 +163,8 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - `src/lib/testi.ts`: legge `contenuti/*.md`, unica fonte dei testi, e li passa alle pagine.
 - `src/lib/percorsi.ts`: `u('/pagina/')` per ogni link interno, così il sito funziona anche in sottocartella.
 - `astro.config.mjs`: riga `DOMINIO` (vuota = anteprima, non indicizzata) e sottocartella `SITO_BASE`.
-- `src/layouts/Base.astro`: testa della pagina, dati per Google e lo script che decide se mostrare l'apertura.
+- `src/layouts/Base.astro`: testa della pagina, dati per Google e i due script in linea: comparsa lenta
+  mentre si scorre e scelta dell'apertura.
 - `src/components/`: Intestazione, Piede, Apertura (monogramma e lamelle), Foto, Marchio, Azioni, Guida.
 - `src/scripts/muro.js`: apertura a mattoni; usa `public/apertura/` e `materiali/muro/celle.json`.
 - `src/pages/`: home, `[servizio]` (4 pagine), lavori, chi-siamo, contatti, note-legali, 404, robots.txt.
@@ -134,8 +175,8 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 
 - Rispondere in italiano semplice: l'utente non è un tecnico.
 - Prima il piano, poi il lavoro: l'utente vuole approvare le scelte importanti.
-- Ramo di lavoro storico: `claude/youthful-hamilton-7pq7ob` (non ancora unito a `main`). Niente pull request
-  se non richieste.
+- Tutto il lavoro è sul ramo `claude/vigilant-ptolemy-vvojok` (contiene anche il vecchio
+  `claude/youthful-hamilton-7pq7ob`), non ancora unito a `main`. Niente pull request se non richieste.
 - Skill da usare: `frontend-design` per la grafica, `algorithmic-art` per l'animazione da computer.
   L'utente ha installato il plugin Design: `design:accessibility-review` e `design:design-critique` servono
   nelle verifiche della fase 4.
@@ -162,3 +203,13 @@ dissolvenza semplice se l'utente ha "riduci animazioni".
 - 2026-11-16: l'utente approva i testi (solo "consulenza gratuita"), chiede più ombra nel muro e meno dati
   personali possibile nella repo. Fatti: ombra e spessore nel prototipo, testi aggiornati, sito costruito con
   Astro (10 pagine, due aperture, dati sensibili da variabili d'ambiente), controlli Lighthouse.
+- 2026-11-16: l'utente decide che i dati che compaiono sul sito non sono riservati e sceglie Cloudflare, con
+  prima un'anteprima gratuita. Fatti: contatti e dati legali in `src/data/sito.ts` (ricontrollati sulla
+  visura), modalità anteprima, link adatti a una sottocartella, `wrangler.jsonc`, `_headers`, flusso per
+  GitHub Pages, README aggiornato.
+- 2026-11-16: verifiche della fase 4. Trovato e corretto: le animazioni di scorrimento nel sito costruito non
+  funzionavano (vedi "Scorrimento"), la guida si vedeva solo oltre 1500 px, l'apertura da computer durava più
+  di 10 secondi, in Lavori la coppia prima/dopo era minuscola su telefono, sui tablet mancava la barra Chiama.
+  Esito: 90 aperture di pagina senza errori né link rotti (3 varianti, 3 larghezze), axe-core senza
+  violazioni, home su telefono lento: elemento principale visibile in 0,7 s, 199 KB. Lighthouse in questa
+  sessione è stato negato dal controllo dei permessi: la velocità è misurata con Playwright.
