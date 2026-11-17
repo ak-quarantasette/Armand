@@ -50,7 +50,7 @@ import { u } from '../lib/percorsi';
   .velo .indizio { position: absolute; right: clamp(18px, 3.2vw, 44px); bottom: clamp(84px, 12vh, 120px); display: grid; justify-items: center; gap: 12px; padding: 10px; border: 0; background: none; color: var(--antracite); font: 500 0.78rem/1 var(--ft); letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer; opacity: 0; transition: opacity 0.6s; }
   .velo .indizio span { writing-mode: vertical-rl; }
   .velo .indizio i { position: relative; width: 1px; height: 56px; background: var(--linea); overflow: hidden; }
-  .velo .indizio i::after { content: ''; position: absolute; left: 0; top: 0; width: 1px; height: 22px; background: var(--blu); animation: ap-filo 1.6s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
+  .velo .indizio i::after { content: ''; position: absolute; left: 0; top: 0; width: 1px; height: 22px; background: var(--accento); animation: ap-filo 1.6s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
   html.apertura-pronta .velo .indizio { opacity: 1; }
 
   @keyframes ap-sali { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }

@@ -96,6 +96,42 @@ const scheda = {
       })();
     </script>
     <script is:inline>
+      // Zoom tra le sezioni (richiesta del cliente). Ogni elemento con classe "zoom" è un po' più piccolo
+      // mentre entra dal basso, arriva a grandezza piena quando occupa lo schermo e si rimpicciolisce di nuovo
+      // uscendo in alto: un leggero zoom in / zoom out tra una sezione e l'altra. Il video in cima si allontana
+      // e si scurisce mentre si scende. Niente di tutto questo con "riduci animazioni".
+      (function () {
+        var d = document.documentElement;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var voci = [], attesa = false;
+        function misura() {
+          attesa = false;
+          var H = innerHeight;
+          for (var i = 0; i < voci.length; i++) {
+            var e = voci[i], r = e.getBoundingClientRect();
+            if (r.bottom < -H || r.top > 2 * H) continue;
+            var eroe = e.classList.contains('eroe');
+            var entra = eroe ? 0 : Math.min(1, Math.max(0, (r.top - H * 0.3) / (H * 0.65)));
+            var esce = Math.min(1, Math.max(0, (H * (eroe ? 1 : 0.7) - r.bottom) / (H * (eroe ? 0.9 : 0.65))));
+            var z = Math.max(entra, esce);
+            z = z * z * (3 - 2 * z); // morbido
+            e.style.setProperty('--zoom', z.toFixed(4));
+            e.style.transformOrigin = entra >= esce ? '50% 0' : '50% 100%';
+            e.classList.toggle('zoomata', z > 0.001);
+          }
+        }
+        function chiedi() { if (!attesa) { attesa = true; requestAnimationFrame(misura); } }
+        document.addEventListener('DOMContentLoaded', function () {
+          // la home segna le sezioni con "zoom"; nelle altre pagine valgono le sezioni normali e la fascia finale
+          voci = [].slice.call(document.querySelectorAll('.zoom, main .sezione, main .invito')).filter(function (e) { return !e.closest('.ruota'); });
+          d.classList.add('zoom-vivo');
+          misura();
+        });
+        addEventListener('scroll', chiedi, { passive: true });
+        addEventListener('resize', chiedi, { passive: true });
+      })();
+    </script>
+    <script is:inline>
       // Comparsa lenta mentre si scorre: "moto" su <html> accende gli effetti (vedi global.css),
       // poi ogni titolo, foto o passo riceve "visto" quando entra nello schermo. Se qualcosa va storto
       // "moto" viene tolta e tutto resta visibile.
@@ -216,6 +252,6 @@ const scheda = {
   @media (max-width: 900px) {
     .barra { position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: grid; grid-template-columns: 1fr 1fr; padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--ardesia); }
     .barra a { display: grid; place-items: center; min-height: 60px; font-weight: 500; color: var(--su-scuro); text-decoration: none; }
-    .barra a:first-child { background: var(--blu); color: #fff; }
+    .barra a:first-child { background: var(--accento); color: #fff; }
   }
 </style>

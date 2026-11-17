@@ -1,5 +1,11 @@
 ---
-// Pagina Lavori, impaginata come una galleria da rivista (riferimento del cliente: spykercars.com).
+// Pagina Lavori con due viste, come nel riferimento crl-2026.webflow.io/library ("Wheel, List").
+// RUOTA (vista iniziale): le foto stanno su un grande cerchio che gira mentre si scorre. Quella in alto al
+//   centro è grande e dritta, le vicine più piccole e inclinate; arrivando al centro si ingrandiscono.
+//   Accanto: numero, gruppo, titolo e nota della foto al centro. Movimento nello script "ruota" in fondo.
+// ELENCO: la galleria da rivista di prima (riferimento spykercars.com), descritta qui sotto.
+// Senza JavaScript o con "riduci animazioni" si vede solo l'elenco.
+//
 // - Foto di misure diverse, alternate a sinistra e a destra e sfalsate in altezza, con didascalie piccole.
 // - Le coppie prima/dopo stanno affiancate su tutta la larghezza.
 // - In ogni gruppo la prima foto orizzontale è "larga": occupa tutta la larghezza e si allarga entrando.
@@ -49,13 +55,42 @@ function impagina(lista: Lavoro[]): Posto[] {
   });
   return posti;
 }
+
+// Ruota: una carta per foto, nell'ordine della pagina (le coppie prima/dopo diventano due carte di fila).
+const carte = tutti.flatMap((l) => l.foto.map((n) => ({ nome: n, titolo: l.titolo, nota: l.didascalia, gruppo: l.gruppo, stato: l.foto.length > 1 ? stato(n) : '', oriz: orizzontale(n) })));
 ---
 <Base titolo={p.titolo} descrizione={p.descrizione}>
   <section class="contenitore cima">
     <h1>{p.h1}</h1>
     <div class="intro"><Blocchi blocchi={p.intro} /></div>
+    <div class="viste" role="group" aria-label="Vista">
+      <button type="button" data-vista="ruota" aria-pressed="true">Ruota</button>
+      <button type="button" data-vista="elenco" aria-pressed="false">Elenco</button>
+    </div>
   </section>
 
+  <section class="ruota" aria-label="Lavori, una foto alla volta" style={`--n:${carte.length}`}>
+    <div class="palco">
+      <div class="anello">
+        {carte.map((c, i) => (
+          <figure class:list={['carta', { oriz: c.oriz }]} data-i={i} data-titolo={c.titolo} data-nota={c.nota} data-gruppo={c.gruppo} data-stato={c.stato}>
+            <Foto nome={c.nome} sizes="(min-width: 900px) 46vw, 80vw" subito={i < 2} />
+            <figcaption class="solo-lettori">{c.titolo}{c.stato ? ` (${c.stato.toLowerCase()})` : ''}: <Fragment set:html={c.nota} /></figcaption>
+          </figure>
+        ))}
+      </div>
+      <div class="scheda" aria-hidden="true">
+        <p class="conta"><span class="ora">01</span><span class="tot"> / {String(carte.length).padStart(2, '0')}</span></p>
+        <p class="gruppo-ora">{carte[0].gruppo}</p>
+        <p class="titolo-ora">{carte[0].titolo}</p>
+        <p class="nota-ora" set:html={carte[0].nota} />
+        <p class="prossimo"></p>
+      </div>
+      <p class="aiuto" aria-hidden="true"><span>Scorri</span><i></i></p>
+    </div>
+  </section>
+
+  <div class="elenco">
   {gruppi.map((g, gi) => (
     <section class="sezione gruppo">
       <div class="contenitore">
@@ -87,6 +122,7 @@ function impagina(lista: Lavoro[]): Posto[] {
       </div>
     </section>
   ))}
+  </div>
 
   <section class="invito su-scuro">
     <div class="contenitore pila">
@@ -96,6 +132,93 @@ function impagina(lista: Lavoro[]): Posto[] {
     </div>
   </section>
 </Base>
+
+<script>
+  // RUOTA: le carte stanno su un cerchio di raggio R con il centro sotto lo schermo; scorrendo il cerchio
+  // gira. pos = quale carta è in cima (anche frazionaria). Ogni carta ha un angolo (i - pos) * passo:
+  // da lì posizione, inclinazione e grandezza (più grande al centro). Viene aggiornata anche la scheda.
+  const d = document.documentElement;
+  const ruota = document.querySelector<HTMLElement>('.ruota');
+  const pulsanti = [...document.querySelectorAll<HTMLButtonElement>('.viste button')];
+  if (ruota && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    d.classList.add('ruota-viva');
+    const carte = [...ruota.querySelectorAll<HTMLElement>('.carta')];
+    const N = carte.length;
+    const scheda = {
+      ora: ruota.querySelector('.ora')!, gruppo: ruota.querySelector('.gruppo-ora')!, titolo: ruota.querySelector('.titolo-ora')!,
+      nota: ruota.querySelector('.nota-ora')!, prossimo: ruota.querySelector('.prossimo')!,
+    };
+    let attiva = -1, attesa = false;
+    const giro = () => {
+      attesa = false;
+      if (!d.classList.contains('vista-ruota')) return;
+      const palco = ruota.querySelector<HTMLElement>('.palco')!;
+      const W = palco.clientWidth, H = palco.clientHeight, tel = W < 700;
+      const r = ruota.getBoundingClientRect();
+      const corsa = Math.max(1, ruota.offsetHeight - H);
+      const t = Math.min(1, Math.max(0, (palco.getBoundingClientRect().top - r.top) / corsa));
+      const pos = t * (N - 1);
+      const R = (tel ? 1.55 : 1.2) * W;
+      const passo = Math.asin(Math.min(0.95, ((tel ? 0.8 : 0.4) * W) / R));
+      const cy = H * (tel ? 0.4 : 0.46);
+      for (let i = 0; i < N; i++) {
+        const a = (i - pos) * passo;
+        const c = carte[i];
+        if (Math.abs(a) > 1.35) { c.style.visibility = 'hidden'; continue; }
+        const vicino = Math.min(1, Math.abs(i - pos)); // 0 al centro, 1 dalla carta accanto in poi
+        const s = 1 - (tel ? 0.42 : 0.36) * vicino;
+        const x = R * Math.sin(a), y = R * (1 - Math.cos(a));
+        c.style.visibility = 'visible';
+        c.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${(y + cy).toFixed(1)}px), 0) rotate(${((a * 180) / Math.PI * 0.85).toFixed(2)}deg) scale(${s.toFixed(4)})`;
+        c.style.zIndex = String(100 - Math.round(Math.abs(i - pos) * 10));
+        c.style.opacity = String(Math.max(0, Math.min(1, 1.6 - Math.abs(a) / 1.35 * 1.4)).toFixed(3));
+      }
+      const k = Math.min(N - 1, Math.max(0, Math.round(pos)));
+      if (k !== attiva) {
+        attiva = k;
+        const c = carte[k].dataset, dopo = carte[k + 1]?.dataset;
+        scheda.ora.textContent = String(k + 1).padStart(2, '0');
+        scheda.gruppo.textContent = c.gruppo + (c.stato ? ' · ' + c.stato : '');
+        scheda.titolo.textContent = c.titolo ?? '';
+        scheda.nota.innerHTML = c.nota ?? '';
+        scheda.prossimo.textContent = dopo ? `${String(k + 2).padStart(2, '0')}  ${dopo.titolo}${dopo.stato ? ' · ' + dopo.stato : ''}` : '';
+        ruota.querySelector('.scheda')!.animate([{ opacity: 0.25, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.22,.61,.36,1)' });
+      }
+    };
+    const chiedi = () => { if (!attesa) { attesa = true; requestAnimationFrame(giro); } };
+    const scegli = (vista: string, scorri = false) => {
+      d.classList.toggle('vista-ruota', vista === 'ruota');
+      d.classList.toggle('vista-elenco', vista === 'elenco');
+      pulsanti.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === vista)));
+      try { sessionStorage.setItem('am-vista-lavori', vista); } catch (e) {}
+      if (scorri) document.querySelector('.viste')!.scrollIntoView({ block: 'start' });
+      attiva = -1; chiedi();
+      dispatchEvent(new Event('scroll'));
+    };
+    pulsanti.forEach((b) => b.addEventListener('click', () => scegli(b.dataset.vista!, true)));
+    let iniziale = 'ruota';
+    try { iniziale = sessionStorage.getItem('am-vista-lavori') || 'ruota'; } catch (e) {}
+    scegli(iniziale);
+    // Aggancio: quando lo scorrimento si ferma dentro la ruota, si posa con calma sulla foto più vicina.
+    let ferma = 0, guidato = false;
+    const aggancia = () => {
+      if (guidato) { guidato = false; return; }
+      if (!d.classList.contains('vista-ruota')) return;
+      const palco = ruota.querySelector<HTMLElement>('.palco')!;
+      const r = ruota.getBoundingClientRect();
+      const corsa = ruota.offsetHeight - palco.clientHeight;
+      if (corsa <= 0) return;
+      const fatto = palco.getBoundingClientRect().top - r.top; // quanto della ruota è già stato percorso
+      const t = fatto / corsa;
+      if (t <= 0.0005 || t >= 0.9995) return; // prima o dopo la ruota: niente aggancio
+      const k = Math.round(t * (N - 1));
+      const meta = scrollY + ((k / (N - 1)) * corsa - fatto);
+      if (Math.abs(meta - scrollY) > 2) { guidato = true; scrollTo({ top: meta, behavior: 'smooth' }); }
+    };
+    addEventListener('scroll', () => { chiedi(); clearTimeout(ferma); ferma = window.setTimeout(aggancia, 160); }, { passive: true });
+    addEventListener('resize', chiedi, { passive: true });
+  }
+</script>
 
 <script>
   // Cornice che si apre e profondità, legate allo scorrimento. Lavora solo sulle foto vicine allo schermo.
@@ -140,6 +263,46 @@ function impagina(lista: Lavoro[]): Posto[] {
 </script>
 
 <style>
+  /* Scelta della vista: c'è solo se la ruota può funzionare */
+  .viste { display: none; gap: 4px; margin-top: 6px; }
+  :global(html.ruota-viva) .viste { display: flex; }
+  .viste button { font: 500 0.82rem/1 var(--ft); letter-spacing: 0.14em; text-transform: uppercase; padding: 10px 14px; border: 1px solid var(--linea); background: none; color: var(--pietra); cursor: pointer; }
+  .viste button[aria-pressed='true'] { border-color: var(--antracite); color: var(--antracite); }
+
+  /* RUOTA. Lunghezza della sezione = quanto si scorre: un passo per foto. */
+  .ruota { display: none; position: relative; height: calc((var(--n) - 1) * 34vh + 100svh - var(--testata)); }
+  :global(html.ruota-viva.vista-ruota) .ruota { display: block; }
+  :global(html.ruota-viva.vista-ruota) .elenco { display: none; }
+  .palco { position: sticky; top: var(--testata); height: calc(100svh - var(--testata)); overflow: hidden; }
+  .anello { position: absolute; inset: 0; }
+  .carta { --alta: min(60vh, 600px); position: absolute; left: 50%; top: 0; margin: 0; width: calc(var(--alta) * 0.75); padding: 8px; background: #fff; box-shadow: 0 22px 50px -24px rgba(44, 36, 30, 0.5); will-change: transform; visibility: hidden; }
+  .carta.oriz { width: min(calc(var(--alta) * 0.8 * 4 / 3), 52vw); }
+  .carta :global(.foto img) { aspect-ratio: 3 / 4; object-fit: cover; }
+  .carta.oriz :global(.foto img) { aspect-ratio: 4 / 3; }
+  .scheda { position: absolute; left: var(--bordo); right: var(--bordo); bottom: clamp(18px, 4vh, 40px); display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'conta gruppo prossimo' 'conta titolo prossimo' 'conta nota prossimo'; column-gap: clamp(16px, 3vw, 48px); align-items: end; z-index: 200; pointer-events: none; }
+  .conta { grid-area: conta; font-family: var(--fd); font-size: clamp(2.6rem, 5vw, 4.4rem); line-height: 0.9; color: var(--accento); }
+  .conta .tot { font-family: var(--ft); font-size: 0.85rem; color: var(--pietra); letter-spacing: 0.1em; }
+  .gruppo-ora { grid-area: gruppo; font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pietra); }
+  .titolo-ora { grid-area: titolo; font-family: var(--fd); font-size: clamp(1.5rem, 2.6vw, 2.3rem); line-height: 1.1; }
+  .nota-ora { grid-area: nota; font-size: 0.9rem; color: var(--pietra); max-width: 52ch; }
+  .prossimo { grid-area: prossimo; font-size: 0.82rem; color: var(--pietra); max-width: 22ch; text-align: right; }
+  .aiuto { position: absolute; right: clamp(14px, 2.4vw, 32px); top: 50%; display: grid; justify-items: center; gap: 10px; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--pietra); transform: translateY(-50%); z-index: 200; }
+  .aiuto span { writing-mode: vertical-rl; }
+  .aiuto i { width: 1px; height: 44px; background: var(--linea); position: relative; overflow: hidden; }
+  .aiuto i::after { content: ''; position: absolute; left: 0; top: 0; width: 1px; height: 18px; background: var(--accento); animation: ruota-filo 1.6s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
+  @keyframes ruota-filo { from { transform: translateY(-20px); } to { transform: translateY(46px); } }
+  .solo-lettori { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  @media (max-width: 899px) {
+    .ruota { height: calc((var(--n) - 1) * 30vh + 100svh - var(--testata) - 60px); }
+    .palco { height: calc(100svh - var(--testata) - 60px); }
+    .carta { --alta: min(52vh, 92vw); }
+    .carta.oriz { width: min(calc(var(--alta) * 0.8 * 4 / 3), 86vw); }
+    .scheda { grid-template-columns: auto minmax(0, 1fr); grid-template-areas: 'conta gruppo' 'conta titolo' 'nota nota'; bottom: 14px; row-gap: 4px; }
+    .prossimo, .aiuto { display: none; }
+    .nota-ora { font-size: 0.84rem; }
+  }
+
   .cima { display: grid; gap: 22px; padding-block: clamp(28px, 5vw, 64px) clamp(36px, 5vw, 64px); }
   .intro :global(p) { font-size: clamp(1.15rem, 1.9vw, 1.4rem); line-height: 1.5; max-width: 46ch; }
 
