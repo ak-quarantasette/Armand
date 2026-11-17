@@ -1,16 +1,54 @@
 ---
+// Pagina Lavori, impaginata come una galleria da rivista (riferimento del cliente: spykercars.com).
+// - Foto di misure diverse, alternate a sinistra e a destra e sfalsate in altezza, con didascalie piccole.
+// - Le coppie prima/dopo stanno affiancate su tutta la larghezza.
+// - In ogni gruppo la prima foto orizzontale è "larga": occupa tutta la larghezza e si allarga entrando.
+// - Ogni foto entra "in cornice": parte ritagliata al centro e un po' ingrandita, e mentre si scorre la
+//   cornice si apre fino alla foto intera; poi scorre un filo più lenta della pagina (profondità).
+//   Il movimento segue lo scorrimento (script in fondo). Senza JavaScript o con "riduci animazioni" le foto
+//   sono semplicemente ferme e intere.
 import Base from '../layouts/Base.astro';
 import Azioni from '../components/Azioni.astro';
 import Blocchi from '../components/Blocchi.astro';
 import Foto from '../components/Foto.astro';
 import { pagina } from '../lib/testi';
-import { lavori } from '../data/foto';
+import { lavori, foto, type Lavoro } from '../data/foto';
 
 const p = pagina('lavori');
 const tutti = lavori();
 const gruppi = [...new Set(tutti.map((l) => l.gruppo))];
 // nelle coppie prima/dopo il nome del file dice quale foto è quale
 const stato = (nome: string) => (nome.endsWith('-prima') ? 'Prima' : nome.endsWith('-dopo') ? 'Dopo' : '');
+const orizzontale = (nome: string) => foto(nome).width > foto(nome).height;
+
+// Posto di ogni lavoro nella griglia a 12 colonne (solo su schermi larghi).
+type Posto = { lavoro: Lavoro; tipo: 'doppio' | 'larga' | 'singola'; col: string; riga: number; sale: boolean; lato: 'sx' | 'dx' };
+function impagina(lista: Lavoro[]): Posto[] {
+  const posti: Posto[] = [];
+  let larga = false, lato: 'sx' | 'dx' = 'sx', n = 0;
+  // ampiezze in colonne: le verticali un po' più strette delle orizzontali, alternate per dare ritmo
+  const ampiezzaV = [5, 4, 4, 5], ampiezzaO = [6, 5];
+  const inizioSx = [2, 1], fineDx = [12, 11];
+  lista.forEach((l, i) => {
+    const riga = i + 1;
+    if (l.foto.length > 1) { posti.push({ lavoro: l, tipo: 'doppio', col: '1 / -1', riga, sale: false, lato }); return; }
+    if (!larga && orizzontale(l.foto[0]) && i > 0) {
+      larga = true;
+      posti.push({ lavoro: l, tipo: 'larga', col: '1 / -1', riga, sale: false, lato });
+      return;
+    }
+    const prima = posti[posti.length - 1];
+    const span = orizzontale(l.foto[0]) ? ampiezzaO[n % 2] : ampiezzaV[n % 4];
+    // ogni lato resta nella sua metà (colonne 1-6 e 7-12), così due foto affiancate non si toccano mai
+    const inizio = lato === 'sx' ? Math.min(inizioSx[n % 2], 7 - span) : Math.max(7, fineDx[n % 2] - span + 1);
+    // sale accanto alla foto precedente se quella era una singola dall'altro lato
+    const sale = !!prima && prima.tipo === 'singola' && prima.lato !== lato;
+    posti.push({ lavoro: l, tipo: 'singola', col: `${inizio} / span ${span}`, riga, sale, lato });
+    lato = lato === 'sx' ? 'dx' : 'sx';
+    n++;
+  });
+  return posti;
+}
 ---
 <Base titolo={p.titolo} descrizione={p.descrizione}>
   <section class="contenitore cima">
@@ -19,26 +57,29 @@ const stato = (nome: string) => (nome.endsWith('-prima') ? 'Prima' : nome.endsWi
   </section>
 
   {gruppi.map((g, gi) => (
-    <section class="sezione">
+    <section class="sezione gruppo">
       <div class="contenitore">
-        <h2>{g}</h2>
-        <div class="griglia">
-          {tutti.filter((l) => l.gruppo === g).map((l, i) => (
-            <article class:list={['lavoro', { doppio: l.foto.length > 1 }]}>
+        <header class="testa">
+          <p class="etichetta">{String(gi + 1).padStart(2, '0')} · Lavori</p>
+          <h2 class="maschera"><span>{g}</span></h2>
+        </header>
+        <div class="galleria">
+          {impagina(tutti.filter((l) => l.gruppo === g)).map((s, i) => (
+            <article class:list={['lavoro', s.tipo, s.lato, { sale: s.sale }]} style={`--col:${s.col};--riga:${s.riga}`}>
               <div class="scatti">
-                {l.foto.map((n) => (
+                {s.lavoro.foto.map((n) => (
                   <Foto
                     nome={n}
-                    classe={['entra', stato(n) && l.foto.length > 1 ? stato(n).toLowerCase() : ''].join(' ').trim()}
+                    classe={['svela', s.tipo === 'larga' ? 'larga' : '', s.tipo === 'doppio' && stato(n) ? stato(n).toLowerCase() : ''].join(' ').trim()}
                     subito={gi === 0 && i === 0}
-                    sizes={l.foto.length > 1 ? '(min-width: 900px) 46vw, 92vw' : '(min-width: 900px) 44vw, 92vw'}
-                    voci={l.foto.length > 1 && stato(n) ? [['Stato', stato(n)]] : []}
+                    sizes={s.tipo === 'singola' ? '(min-width: 900px) 46vw, 92vw' : s.tipo === 'larga' ? '(min-width: 1340px) 1240px, 94vw' : '(min-width: 900px) 56vw, 92vw'}
+                    voci={s.tipo === 'doppio' && stato(n) ? [['Stato', stato(n)]] : []}
                   />
                 ))}
               </div>
               <dl class="cartiglio">
-                <dt>Lavoro</dt><dd>{l.titolo}</dd>
-                <dt>Note</dt><dd set:html={l.didascalia} />
+                <dt>Lavoro</dt><dd>{s.lavoro.titolo}</dd>
+                <dt>Note</dt><dd set:html={s.lavoro.didascalia} />
               </dl>
             </article>
           ))}
@@ -56,19 +97,87 @@ const stato = (nome: string) => (nome.endsWith('-prima') ? 'Prima' : nome.endsWi
   </section>
 </Base>
 
+<script>
+  // Cornice che si apre e profondità, legate allo scorrimento. Lavora solo sulle foto vicine allo schermo.
+  // Scrive due numeri su ogni foto: --apri (1 = chiusa, 0 = aperta) e --sposta (da -1 a 1, posizione
+  // rispetto al centro dello schermo). Il resto lo fa il CSS qui sotto.
+  const d = document.documentElement;
+  if (d.classList.contains('moto')) {
+    const foto = [...document.querySelectorAll<HTMLElement>('.galleria .svela')];
+    const vicine = new Set<HTMLElement>();
+    const morbido = (t: number) => 1 - Math.pow(1 - t, 3);
+    let attesa = false;
+    const giro = () => {
+      attesa = false;
+      const H = innerHeight;
+      for (const f of vicine) {
+        const r = (f.querySelector('picture') ?? f).getBoundingClientRect();
+        const corsa = H * (f.classList.contains('larga') ? 0.85 : 0.6); // quanto scorrere per aprirla tutta
+        const p = Math.min(1, Math.max(0, (H - r.top) / corsa));
+        const q = Math.max(-1, Math.min(1, (r.top + r.height / 2 - H / 2) / H));
+        f.style.setProperty('--apri', (1 - morbido(p)).toFixed(4));
+        f.style.setProperty('--sposta', q.toFixed(4));
+      }
+    };
+    const chiedi = () => { if (!attesa) { attesa = true; requestAnimationFrame(giro); } };
+    const io = new IntersectionObserver((voci) => {
+      for (const v of voci) {
+        const f = v.target as HTMLElement;
+        if (v.isIntersecting) vicine.add(f);
+        else {
+          vicine.delete(f);
+          // passata sopra lo schermo: resta aperta
+          if (v.boundingClientRect.bottom < 0) f.style.setProperty('--apri', '0');
+        }
+      }
+      chiedi();
+    }, { rootMargin: '25% 0px' });
+    foto.forEach((f) => io.observe(f));
+    addEventListener('scroll', chiedi, { passive: true });
+    addEventListener('resize', chiedi, { passive: true });
+    d.classList.add('galleria-viva');
+  }
+</script>
+
 <style>
   .cima { display: grid; gap: 22px; padding-block: clamp(28px, 5vw, 64px) clamp(36px, 5vw, 64px); }
   .intro :global(p) { font-size: clamp(1.15rem, 1.9vw, 1.4rem); line-height: 1.5; max-width: 46ch; }
-  .griglia { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(40px, 6vw, 96px) clamp(18px, 3.5vw, 48px); align-items: start; margin-top: clamp(28px, 4vw, 52px); }
-  .lavoro { min-width: 0; }
-  .lavoro:nth-child(even):not(.doppio) { margin-top: clamp(0px, 8vw, 120px); }
-  .doppio { grid-column: 1 / -1; }
+
+  .gruppo + .gruppo { border-top: 0; }
+  .testa { display: grid; gap: 14px; margin-bottom: clamp(36px, 6vw, 96px); }
+  .etichetta { font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--pietra); }
+
+  /* Galleria: su schermi larghi 12 colonne, ogni lavoro nella sua riga e al suo posto */
+  .galleria { --sale: clamp(80px, 15vw, 240px); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: clamp(16px, 2.5vw, 36px); row-gap: clamp(56px, 8vw, 120px); align-items: start; }
+  .lavoro { min-width: 0; grid-column: var(--col); grid-row: var(--riga); }
+  .lavoro.sale { margin-top: calc(-1 * var(--sale)); }
   .doppio .scatti { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(14px, 3vw, 40px); align-items: end; }
+  .doppio .cartiglio { max-width: 36rem; }
+
+  /* didascalie piccole e leggere, come in una rivista */
+  .lavoro .cartiglio { font-size: 0.8rem; gap: 1px 14px; margin-top: 10px; padding-top: 8px; border-top-color: var(--linea); max-width: 34rem; }
+  .lavoro .cartiglio dd { color: var(--pietra); }
+  .lavoro .cartiglio dd:first-of-type { color: var(--antracite); }
+  .lavoro :global(.foto .cartiglio) { border-top-color: var(--linea); }
+
+  /* Cornice che si apre: solo se lo script è partito (html.galleria-viva). La foto si apre dal centro;
+     quella larga si apre dai lati, come una fascia che si allarga. */
+  :global(html.galleria-viva) .lavoro :global(.svela picture) { display: block; overflow: hidden; clip-path: inset(calc(var(--apri, 1) * 20%)); will-change: clip-path; }
+  :global(html.galleria-viva) .lavoro :global(.svela.larga picture) { clip-path: inset(calc(var(--apri, 1) * 6%) calc(var(--apri, 1) * 18%)); }
+  :global(html.galleria-viva) .lavoro :global(.svela img) { transform: translate3d(0, calc(var(--sposta, 0) * 4%), 0) scale(calc(1.08 + var(--apri, 1) * 0.12)); transform-origin: 50% 50%; will-change: transform; }
+  /* il cartiglio sotto la foto compare quando la cornice è quasi aperta */
+  :global(html.galleria-viva) .lavoro :global(.svela figcaption) { opacity: calc(1 - var(--apri, 1) * 2); }
+
   .invito { background: var(--ardesia); color: var(--su-scuro); padding-block: clamp(56px, 8vw, 104px); }
   .invito p { font-size: 1.15rem; color: var(--su-scuro-2); }
-  @media (max-width: 700px) {
-    .griglia { grid-template-columns: minmax(0, 1fr); }
-    .lavoro:nth-child(even):not(.doppio) { margin-top: 0; }
+
+  /* Telefono e tablet: una colonna, ma con larghezze alternate per non perdere il ritmo */
+  @media (max-width: 899px) {
+    .galleria { grid-template-columns: minmax(0, 1fr); row-gap: clamp(44px, 10vw, 72px); }
+    .lavoro { grid-column: 1; grid-row: auto; }
+    .lavoro.sale { margin-top: 0; }
+    .singola.dx { width: 84%; margin-left: auto; }
+    .singola.sx { width: 92%; }
   }
   @media (max-width: 560px) {
     .doppio .scatti { grid-template-columns: minmax(0, 1fr); }
