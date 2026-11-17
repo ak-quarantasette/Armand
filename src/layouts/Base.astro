@@ -121,8 +121,8 @@ const scheda = {
     </script>
     <script is:inline>
       // Apertura: decide subito, prima che la pagina compaia, se mostrarla. Una volta per visita, mai se
-      // l'utente ha chiesto meno movimento. Su computer (mouse) parte il muro di mattoni; su telefono compare
-      // il logo. Poi la schermata con il logo resta ferma e SI ENTRA NEL SITO SCORRENDO: la schermata segue
+      // l'utente ha chiesto meno movimento. Su computer (mouse) parte il muro di mattoni; su telefono il logo
+      // si disegna. Poi la schermata con il logo resta ferma e SI ENTRA NEL SITO SCORRENDO: la schermata segue
       // la rotella o il dito e sale via come un sipario. Vanno bene anche un tasto o un tocco.
       (function () {
         try {
@@ -185,7 +185,8 @@ const scheda = {
             if (pronta) return; pronta = true; dal = Date.now();
             d.classList.add('apertura-pronta');
           };
-          if (!pc) setTimeout(window.amPronta, 1300);
+          // su telefono lo chiama il logo quando ha finito di disegnarsi; al più tardi dopo 6 secondi
+          if (!pc) setTimeout(window.amPronta, 6000);
           // su computer: se il muro non parte entro 4 secondi, o comunque dopo 16, si può entrare lo stesso
           else {
             setTimeout(function () { if (!window.amMuroPartito) window.amPronta(); }, 4000);

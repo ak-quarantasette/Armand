@@ -91,7 +91,10 @@ nessuna apertura se l'utente ha "riduci animazioni".
   chiesto l'effetto "doppio fondo". Parte solo con `(hover: hover) and (pointer: fine)` e schermo da 900 px in su.
   Durata misurata: 7-8 secondi se nessuno tocca nulla (dopo 3 secondi di muro finito crolla da solo); finché il
   visitatore gioca col mouse va avanti, al massimo 7,5 secondi di gioco. Clic, tasto o rotella: crolla subito.
-- **Telefono**: compare il logo dell'azienda. Anche su computer dietro il muro c'è il logo.
+- **Telefono** (richiesta dell'utente): il logo dell'azienda si disegna da solo, a tratto (tetti, onda,
+  scritte) e poi si riempie di colore, in circa 2,5 secondi; poi compare "Scorri". Il file animato lo crea
+  `src/pages/apertura/logo-disegno.svg.ts` dal logo vero: se il logo cambia, il disegno si aggiorna da solo.
+  Su computer dietro il muro c'è il logo fermo.
 - **Ingresso nel sito (richiesta dell'utente)**: finita l'apertura la schermata con il logo resta ferma e si
   entra scorrendo: segue la rotella o il dito e sale via come un sipario (oltre il 18% entra, altrimenti
   torna giù). A lato c'è la scritta "Scorri", che è anche un pulsante; vanno bene anche freccia giù, spazio
@@ -176,9 +179,9 @@ nessuna apertura se l'utente ha "riduci animazioni".
 - `materiali/originali/`: logo attuale e 27 foto dell'utente, al massimo 1440 px di lato. Le 16 arrivate il
   2026-11-16 sono tetti (coppi, lamiera, fasi del rifacimento) e cantieri (massetti, vespaio, solaio, scavo).
   Le foto nuove l'utente le carica nella cartella principale di `main`: vanno rinominate e spostate qui.
-  Finiti: facciata prima e dopo dello stesso edificio, bagno con doccia, parete con carta da parati,
-  soggiorno, cucina-soggiorno, sala da pranzo, scala in legno. In corso d'opera: doccia in muratura,
-  massetto, stanza in cantiere. Sono già leggere: il sito ne genera versioni AVIF/WebP per ogni schermo.
+  Finiti: facciata e sala da pranzo, ciascuna prima e dopo (file `-prima`/`-dopo`: in Lavori diventano una
+  coppia con le etichette), bagno con doccia, parete con carta da parati, soggiorno, cucina-soggiorno, scala
+  in legno. In corso d'opera: doccia in muratura, massetto. Sono già leggere: il sito ne genera versioni AVIF/WebP per ogni schermo.
 - `materiali/logo/`: logo dell'azienda in SVG (colori originali e attenuati) e monogramma "Tetti".
 - `materiali/muro/`: foto del muro di mattoni, sagome e celle per l'apertura da computer.
 - `contenuti/`: testi delle 9 pagine (home, 4 servizi, lavori, chi siamo, contatti, note legali).
@@ -253,3 +256,6 @@ nessuna apertura se l'utente ha "riduci animazioni".
   riferimento. Fatto: quattro toni legati alle tappe della guida.
 - 2026-11-16: l'utente chiede lo sfondo sfumato e non netto, e di entrare nel sito scorrendo dopo l'apertura,
   con la scritta "Scorri" a lato, anche su telefono. Fatti entrambi.
+- 2026-11-17: l'utente chiede che su telefono il logo si disegni e corregge due didascalie. Fatti: logo che
+  si traccia e si colora; la "stanza in cantiere" è la sala da pranzo prima dei lavori (stessa stanza, stesso
+  angolo), quindi le due foto sono ora una coppia prima/dopo in Lavori.
