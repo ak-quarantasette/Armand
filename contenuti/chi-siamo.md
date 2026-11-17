@@ -8,8 +8,6 @@ url: /chi-siamo/
 
 A.M. Costruzioni è un'impresa edile di Fara Gera d'Adda. Lavoriamo dal 2017 su case, negozi e tetti della zona.
 
-Siamo un'impresa piccola, e per chi ci chiama è un vantaggio: chi viene a fare il sopralluogo è la stessa persona che poi trovi in cantiere.
-
 ## Come lavoriamo
 
 - Preventivi scritti e chiari, voce per voce

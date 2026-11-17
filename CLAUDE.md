@@ -259,3 +259,5 @@ nessuna apertura se l'utente ha "riduci animazioni".
 - 2026-11-17: l'utente chiede che su telefono il logo si disegni e corregge due didascalie. Fatti: logo che
   si traccia e si colora; la "stanza in cantiere" è la sala da pranzo prima dei lavori (stessa stanza, stesso
   angolo), quindi le due foto sono ora una coppia prima/dopo in Lavori.
+- 2026-11-17: su richiesta dell'utente tolta da Chi siamo la frase "Siamo un'impresa piccola…": non
+  descrivere l'azienda come piccola.
