@@ -15,7 +15,7 @@ Una selezione di cantieri, finiti e in corso. Le foto sono nostre, scattate sul 
 - **Parete decorata** (parete-carta-da-parati). Carta da parati posata a tutta altezza.
 - **Soggiorno** (soggiorno). Pavimento effetto legno, controsoffitto con faretti e pareti rifinite.
 - **Cucina a vista** (cucina-soggiorno). Zona giorno aperta, con isola e pavimento continuo.
-- **Sala da pranzo** (sala-da-pranzo). Pareti e soffitto rifiniti, nuova illuminazione.
+- **Sala da pranzo** (sala-da-pranzo-prima, sala-da-pranzo-dopo). Come si presentava la stanza prima dei lavori e com'è ora: pareti e soffitto rifiniti, nuova illuminazione.
 - **Scala** (scala-in-legno). Gradini in legno tra pareti rasate e tinteggiate.
 
 ## Tetti e coperture
@@ -41,4 +41,3 @@ Una selezione di cantieri, finiti e in corso. Le foto sono nostre, scattate sul 
 
 - **Doccia in muratura** (cantiere-doccia-in-muratura). Il piatto doccia costruito su misura e impermeabilizzato prima della posa.
 - **Massetto** (cantiere-massetto). La stesura del massetto, prima dei nuovi pavimenti.
-- **Prima dei lavori** (stanza-in-cantiere). Una stanza com'era quando siamo arrivati.
