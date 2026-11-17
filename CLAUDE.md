@@ -139,8 +139,15 @@ nessuna apertura se l'utente ha "riduci animazioni".
 - **Lavori a ruota** (richiesta dell'utente, riferimento crl-2026.webflow.io/library, che da qui non si
   riesce a far girare: la ruota è ricostruita dalle sue schermate): vista iniziale "Ruota", una carta per
   foto su un grande cerchio che gira scorrendo; la carta al centro è grande e dritta, le vicine più piccole e
-  inclinate; scheda con numero, gruppo, titolo, nota e foto successiva; quando lo scorrimento si ferma la
-  ruota si posa sulla foto più vicina. Su telefono le foto si ingrandiscono arrivando al centro. La vista
+  inclinate; scheda con numero, gruppo, titolo, nota e foto successiva. Ogni gesto porta UNA foto (l'utente
+  ha segnalato "poco reattiva" e "la seconda foto non esce"): dito sulla ruota = foto dopo/prima (lo
+  scorrimento della pagina è bloccato, salvo alla prima foto verso l'alto e all'ultima verso il basso);
+  scatto di rotella = una foto, rotella tenuta girata = una ogni 0,45 s; gesto di trackpad con slancio = una
+  foto. La ruota parte subito sotto l'intestazione (titolo e pulsanti Ruota/Elenco sopra, piccoli): se ci
+  fosse altro sopra, su iPhone il gesto d'ingresso sarebbe uno scorrimento normale e lo slancio salterebbe
+  foto. La ruota insegue lo scorrimento con un movimento morbido; quando si ferma si posa sulla foto più
+  vicina. Su telefono le foto si ingrandiscono arrivando al centro. Prove: gesti simulati con
+  `Input.dispatchTouchEvent` di Playwright e rotella con `mouse.wheel`. La vista
   "Elenco" è la galleria descritta qui sotto. Tutto in `src/pages/lavori.astro`.
 - **Pagina Lavori come galleria (vista Elenco)** (richiesta dell'utente, riferimento spykercars.com): foto di misure diverse
   alternate a sinistra e destra su 12 colonne e sfalsate in altezza (ogni lato resta nella sua metà, così non
@@ -296,3 +303,6 @@ nessuna apertura se l'utente ha "riduci animazioni".
 - 2026-11-17: dopo la prova su iPhone l'utente chiede: home meno "da template", zoom tra le sezioni, video dopo
   l'apertura con nome e pulsanti, niente blu, foto di qualità in home, Lavori a ruota. Fatto tutto tranne le
   foto di repertorio, che deve caricare lui (siti di foto bloccati da qui): per ora fotogrammi del video.
+- 2026-11-17: l'utente segnala la ruota poco reattiva e la seconda foto che non esce. Rifatta: una foto per
+  gesto (dito, rotella, trackpad), ruota subito sotto l'intestazione, movimento morbido, foto vicine visibili
+  ai lati anche su telefono.

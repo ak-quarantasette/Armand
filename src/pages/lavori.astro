@@ -135,43 +135,54 @@ const carte = tutti.flatMap((l) => l.foto.map((n) => ({ nome: n, titolo: l.titol
 
 <script>
   // RUOTA: le carte stanno su un cerchio di raggio R con il centro sotto lo schermo; scorrendo il cerchio
-  // gira. pos = quale carta è in cima (anche frazionaria). Ogni carta ha un angolo (i - pos) * passo:
-  // da lì posizione, inclinazione e grandezza (più grande al centro). Viene aggiornata anche la scheda.
+  // gira. "meta" = quale carta deve stare in cima secondo lo scorrimento; "pos" = quella mostrata, che la
+  // insegue con un movimento morbido (così anche la rotella a scatti dà un giro fluido). Ogni carta ha un
+  // angolo (i - pos) * passo: da lì posizione, inclinazione e grandezza (più grande al centro).
+  // Telefono e tablet: ogni gesto del dito porta alla foto dopo o a quella prima, una alla volta.
+  // Computer: scorrimento libero; quando si ferma la ruota si posa sulla foto più vicina.
   const d = document.documentElement;
   const ruota = document.querySelector<HTMLElement>('.ruota');
   const pulsanti = [...document.querySelectorAll<HTMLButtonElement>('.viste button')];
   if (ruota && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     d.classList.add('ruota-viva');
+    const palco = ruota.querySelector<HTMLElement>('.palco')!;
     const carte = [...ruota.querySelectorAll<HTMLElement>('.carta')];
     const N = carte.length;
+    const tocco = matchMedia('(pointer: coarse)').matches;
     const scheda = {
-      ora: ruota.querySelector('.ora')!, gruppo: ruota.querySelector('.gruppo-ora')!, titolo: ruota.querySelector('.titolo-ora')!,
-      nota: ruota.querySelector('.nota-ora')!, prossimo: ruota.querySelector('.prossimo')!,
+      box: ruota.querySelector<HTMLElement>('.scheda')!, ora: ruota.querySelector('.ora')!, gruppo: ruota.querySelector('.gruppo-ora')!,
+      titolo: ruota.querySelector('.titolo-ora')!, nota: ruota.querySelector('.nota-ora')!, prossimo: ruota.querySelector('.prossimo')!,
     };
-    let attiva = -1, attesa = false;
-    const giro = () => {
-      attesa = false;
-      if (!d.classList.contains('vista-ruota')) return;
-      const palco = ruota.querySelector<HTMLElement>('.palco')!;
-      const W = palco.clientWidth, H = palco.clientHeight, tel = W < 700;
+    const inRuota = () => d.classList.contains('vista-ruota');
+    // misure della ruota rispetto alla pagina
+    const misure = () => {
       const r = ruota.getBoundingClientRect();
-      const corsa = Math.max(1, ruota.offsetHeight - H);
-      const t = Math.min(1, Math.max(0, (palco.getBoundingClientRect().top - r.top) / corsa));
-      const pos = t * (N - 1);
+      const fermo = parseFloat(getComputedStyle(palco).top) || 0; // dove si ferma il palco (sotto l'intestazione)
+      const corsa = Math.max(1, ruota.offsetHeight - palco.clientHeight);
+      const inizio = r.top + scrollY - fermo; // scorrimento al quale la ruota parte
+      return { corsa, inizio, t: Math.min(1, Math.max(0, (scrollY - inizio) / corsa)) };
+    };
+    const yDi = (k: number) => { const m = misure(); return m.inizio + (k / (N - 1)) * m.corsa; };
+
+    let pos = 0, meta = 0, attiva = -1, gira = false;
+    const disegna = () => {
+      const W = palco.clientWidth, H = palco.clientHeight, tel = W < 700;
       const R = (tel ? 1.55 : 1.2) * W;
-      const passo = Math.asin(Math.min(0.95, ((tel ? 0.8 : 0.4) * W) / R));
-      const cy = H * (tel ? 0.4 : 0.46);
+      const passo = Math.asin(Math.min(0.95, ((tel ? 0.64 : 0.4) * W) / R));
+      const cy = H * (tel ? 0.46 : 0.5);
       for (let i = 0; i < N; i++) {
+        const c = carte[i], dist = Math.abs(i - pos);
+        // le carte lontane non si disegnano; quelle vicine ma fuori campo si preparano (così le foto sono pronte)
+        if (dist > 4) { c.style.display = 'none'; continue; }
+        c.style.display = '';
         const a = (i - pos) * passo;
-        const c = carte[i];
         if (Math.abs(a) > 1.35) { c.style.visibility = 'hidden'; continue; }
-        const vicino = Math.min(1, Math.abs(i - pos)); // 0 al centro, 1 dalla carta accanto in poi
-        const s = 1 - (tel ? 0.42 : 0.36) * vicino;
+        const s = 1 - (tel ? 0.42 : 0.36) * Math.min(1, dist);
         const x = R * Math.sin(a), y = R * (1 - Math.cos(a));
         c.style.visibility = 'visible';
         c.style.transform = `translate3d(calc(-50% + ${x.toFixed(1)}px), calc(-50% + ${(y + cy).toFixed(1)}px), 0) rotate(${((a * 180) / Math.PI * 0.85).toFixed(2)}deg) scale(${s.toFixed(4)})`;
-        c.style.zIndex = String(100 - Math.round(Math.abs(i - pos) * 10));
-        c.style.opacity = String(Math.max(0, Math.min(1, 1.6 - Math.abs(a) / 1.35 * 1.4)).toFixed(3));
+        c.style.zIndex = String(100 - Math.round(dist * 10));
+        c.style.opacity = Math.max(0, Math.min(1, 1.6 - (Math.abs(a) / 1.35) * 1.4)).toFixed(3);
       }
       const k = Math.min(N - 1, Math.max(0, Math.round(pos)));
       if (k !== attiva) {
@@ -182,41 +193,104 @@ const carte = tutti.flatMap((l) => l.foto.map((n) => ({ nome: n, titolo: l.titol
         scheda.titolo.textContent = c.titolo ?? '';
         scheda.nota.innerHTML = c.nota ?? '';
         scheda.prossimo.textContent = dopo ? `${String(k + 2).padStart(2, '0')}  ${dopo.titolo}${dopo.stato ? ' · ' + dopo.stato : ''}` : '';
-        ruota.querySelector('.scheda')!.animate([{ opacity: 0.25, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 450, easing: 'cubic-bezier(.22,.61,.36,1)' });
+        scheda.box.animate([{ opacity: 0.3, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 380, easing: 'cubic-bezier(.22,.61,.36,1)' });
       }
     };
-    const chiedi = () => { if (!attesa) { attesa = true; requestAnimationFrame(giro); } };
+    // la ruota insegue lo scorrimento: veloce ma morbida
+    const passo = () => {
+      const diff = meta - pos;
+      pos = Math.abs(diff) < 0.002 ? meta : pos + diff * (tocco ? 0.3 : 0.2);
+      disegna();
+      if (pos !== meta) requestAnimationFrame(passo); else gira = false;
+    };
+    const aggiorna = () => {
+      if (!inRuota()) return;
+      meta = misure().t * (N - 1);
+      if (!gira) { gira = true; requestAnimationFrame(passo); }
+    };
+
+    // Telefono: un gesto = una foto. Il dito sulla ruota non fa scorrere la pagina, salvo alla prima foto
+    // verso l'alto e all'ultima verso il basso, per entrare e uscire dalla ruota.
+    let y0 = 0, x0 = 0, voluta = -1, bloccato = false;
+    const vai = (k: number) => { voluta = k; scrollTo({ top: yDi(k), behavior: 'smooth' }); };
+    if (tocco) {
+      palco.addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; bloccato = false; }, { passive: true });
+      palco.addEventListener('touchmove', (e) => {
+        if (!inRuota()) return;
+        const dy = y0 - e.touches[0].clientY, dx = x0 - e.touches[0].clientX;
+        const m = misure();
+        const dentro = scrollY >= m.inizio - 2 && scrollY <= m.inizio + m.corsa + 2;
+        if (!dentro) return; // la ruota non è ancora ferma sotto l'intestazione: scorrimento normale
+        const k = voluta >= 0 ? voluta : Math.round(m.t * (N - 1));
+        const esce = (dy > 0 && k >= N - 1) || (dy < 0 && k <= 0);
+        if (esce && !bloccato) return;
+        if (Math.abs(dy) > 4 || Math.abs(dx) > 4) bloccato = true;
+        e.preventDefault();
+      }, { passive: false });
+      palco.addEventListener('touchend', (e) => {
+        if (!bloccato || !inRuota()) return;
+        const t = e.changedTouches[0];
+        const dy = y0 - t.clientY, dx = x0 - t.clientX;
+        const spinta = Math.abs(dy) >= Math.abs(dx) ? dy : dx; // anche un gesto in orizzontale va bene
+        if (Math.abs(spinta) < 24) return;
+        const k = voluta >= 0 ? voluta : Math.round(misure().t * (N - 1));
+        vai(Math.min(N - 1, Math.max(0, k + Math.sign(spinta))));
+      });
+    }
+
+    // Computer: ogni movimento di rotella o trackpad porta alla foto dopo o a quella prima; tenendo girata la
+    // rotella del mouse le foto continuano a scorrere; con il trackpad un gesto (slancio compreso) vale una foto.
+    // Prima e ultima foto: la pagina scorre normalmente.
+    let somma = 0, libera = true, sblocca = 0, quiete = 0, ultimoPasso = 0;
+    addEventListener('wheel', (e) => {
+      if (!inRuota() || e.ctrlKey) return;
+      const m = misure();
+      if (scrollY < m.inizio - 2 || scrollY > m.inizio + m.corsa + 2) return;
+      const k = voluta >= 0 ? voluta : Math.round(m.t * (N - 1));
+      const giu = e.deltaY > 0;
+      if ((giu && k >= N - 1) || (!giu && k <= 0)) return;
+      e.preventDefault();
+      somma += e.deltaY * (e.deltaMode === 1 ? 32 : 1);
+      clearTimeout(quiete); quiete = window.setTimeout(() => { libera = true; somma = 0; }, 180);
+      // rotella del mouse (scatti grandi) tenuta girata: una foto ogni 0,45 s; il trackpad invece deve fermarsi
+      if (!libera && Math.abs(e.deltaY) >= 50 && performance.now() - ultimoPasso > 450) libera = true;
+      if (libera && Math.abs(somma) > 30) {
+        vai(Math.min(N - 1, Math.max(0, k + Math.sign(somma))));
+        somma = 0; libera = false; ultimoPasso = performance.now();
+      }
+    }, { passive: false });
+
+    // Quando lo scorrimento si ferma, la ruota si posa sulla foto più vicina. Su telefono solo a dito staccato
+    // (serve quando si arriva nella ruota scorrendo da più in alto e ci si ferma tra due foto).
+    let ferma = 0, dito = false;
+    addEventListener('touchstart', () => { dito = true; }, { passive: true });
+    addEventListener('touchend', () => { dito = false; }, { passive: true });
+    addEventListener('touchcancel', () => { dito = false; }, { passive: true });
+    const posa = () => {
+      if (voluta >= 0 && Math.abs(yDi(voluta) - scrollY) > 2) return; // sta ancora andando alla foto scelta
+      voluta = -1;
+      if (dito || !inRuota()) return;
+      const m = misure();
+      if (m.t <= 0.0005 || m.t >= 0.9995) return;
+      const y = yDi(Math.round(m.t * (N - 1)));
+      if (Math.abs(y - scrollY) > 2) scrollTo({ top: y, behavior: 'smooth' });
+    };
+    addEventListener('scroll', () => { aggiorna(); clearTimeout(ferma); ferma = window.setTimeout(posa, tocco ? 250 : 180); }, { passive: true });
+    addEventListener('resize', () => { attiva = -1; aggiorna(); disegna(); }, { passive: true });
+
     const scegli = (vista: string, scorri = false) => {
       d.classList.toggle('vista-ruota', vista === 'ruota');
       d.classList.toggle('vista-elenco', vista === 'elenco');
       pulsanti.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.vista === vista)));
       try { sessionStorage.setItem('am-vista-lavori', vista); } catch (e) {}
       if (scorri) document.querySelector('.viste')!.scrollIntoView({ block: 'start' });
-      attiva = -1; chiedi();
+      if (vista === 'ruota') { attiva = -1; meta = pos = misure().t * (N - 1); disegna(); }
       dispatchEvent(new Event('scroll'));
     };
     pulsanti.forEach((b) => b.addEventListener('click', () => scegli(b.dataset.vista!, true)));
     let iniziale = 'ruota';
     try { iniziale = sessionStorage.getItem('am-vista-lavori') || 'ruota'; } catch (e) {}
     scegli(iniziale);
-    // Aggancio: quando lo scorrimento si ferma dentro la ruota, si posa con calma sulla foto più vicina.
-    let ferma = 0, guidato = false;
-    const aggancia = () => {
-      if (guidato) { guidato = false; return; }
-      if (!d.classList.contains('vista-ruota')) return;
-      const palco = ruota.querySelector<HTMLElement>('.palco')!;
-      const r = ruota.getBoundingClientRect();
-      const corsa = ruota.offsetHeight - palco.clientHeight;
-      if (corsa <= 0) return;
-      const fatto = palco.getBoundingClientRect().top - r.top; // quanto della ruota è già stato percorso
-      const t = fatto / corsa;
-      if (t <= 0.0005 || t >= 0.9995) return; // prima o dopo la ruota: niente aggancio
-      const k = Math.round(t * (N - 1));
-      const meta = scrollY + ((k / (N - 1)) * corsa - fatto);
-      if (Math.abs(meta - scrollY) > 2) { guidato = true; scrollTo({ top: meta, behavior: 'smooth' }); }
-    };
-    addEventListener('scroll', () => { chiedi(); clearTimeout(ferma); ferma = window.setTimeout(aggancia, 160); }, { passive: true });
-    addEventListener('resize', chiedi, { passive: true });
   }
 </script>
 
@@ -269,13 +343,20 @@ const carte = tutti.flatMap((l) => l.foto.map((n) => ({ nome: n, titolo: l.titol
   .viste button { font: 500 0.82rem/1 var(--ft); letter-spacing: 0.14em; text-transform: uppercase; padding: 10px 14px; border: 1px solid var(--linea); background: none; color: var(--pietra); cursor: pointer; }
   .viste button[aria-pressed='true'] { border-color: var(--antracite); color: var(--antracite); }
 
+  /* Con la ruota attiva, titolo e pulsanti stanno sopra la ruota, piccoli, in cima: la ruota parte subito
+     sotto l'intestazione, così ogni gesto del dito fin dal primo porta una foto alla volta. */
+  :global(html.ruota-viva.vista-ruota) .cima { position: absolute; top: var(--testata); left: 0; right: 0; z-index: 210; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding-block: clamp(12px, 2vw, 22px); pointer-events: none; }
+  :global(html.ruota-viva.vista-ruota) .cima h1 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
+  :global(html.ruota-viva.vista-ruota) .cima .intro { display: none; }
+  :global(html.ruota-viva.vista-ruota) .viste { margin: 0; pointer-events: auto; }
+
   /* RUOTA. Lunghezza della sezione = quanto si scorre: un passo per foto. */
   .ruota { display: none; position: relative; height: calc((var(--n) - 1) * 34vh + 100svh - var(--testata)); }
   :global(html.ruota-viva.vista-ruota) .ruota { display: block; }
   :global(html.ruota-viva.vista-ruota) .elenco { display: none; }
-  .palco { position: sticky; top: var(--testata); height: calc(100svh - var(--testata)); overflow: hidden; }
+  .palco { position: sticky; top: var(--testata); height: calc(100svh - var(--testata)); overflow: hidden; touch-action: pan-y; }
   .anello { position: absolute; inset: 0; }
-  .carta { --alta: min(60vh, 600px); position: absolute; left: 50%; top: 0; margin: 0; width: calc(var(--alta) * 0.75); padding: 8px; background: #fff; box-shadow: 0 22px 50px -24px rgba(44, 36, 30, 0.5); will-change: transform; visibility: hidden; }
+  .carta { --alta: min(60vh, 600px); position: absolute; left: 50%; top: 0; margin: 0; width: calc(var(--alta) * 0.75); padding: 8px; background: #fff; box-shadow: 0 22px 50px -24px rgba(44, 36, 30, 0.5); visibility: hidden; }
   .carta.oriz { width: min(calc(var(--alta) * 0.8 * 4 / 3), 52vw); }
   .carta :global(.foto img) { aspect-ratio: 3 / 4; object-fit: cover; }
   .carta.oriz :global(.foto img) { aspect-ratio: 4 / 3; }
