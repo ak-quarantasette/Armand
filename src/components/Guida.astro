@@ -1,6 +1,6 @@
 ---
 // Guida verticale a sinistra, solo su computer: racconta il cantiere mentre si scorre la home.
-// Il segno blu scende dal sopralluogo alla consegna e la tappa in corso si scurisce.
+// Il segno color mattone scende dal sopralluogo alla consegna e la tappa in corso si scurisce.
 // Va messa come primo elemento dentro il contenitore ".racconto" (vedi index.astro): resta ferma a metà
 // schermo finché si scorrono le sezioni chiare e se ne va con loro prima della fascia scura dei contatti.
 // Usa una funzione dei browser recenti (animazioni legate allo scorrimento); dove manca, non compare.
@@ -25,7 +25,7 @@ const tappe = ['Sopralluogo', 'Preventivo', 'Cantiere', 'Consegna'];
       .ancora { display: block; position: sticky; top: calc(50vh + var(--alta) / 2 + 28px); z-index: 5; height: 0; pointer-events: none; --alta: 300px; }
       .guida { position: absolute; left: 16px; bottom: 28px; display: grid; grid-template-columns: 9px auto; gap: 8px; height: var(--alta); color: var(--pietra); font-size: 0.72rem; letter-spacing: 0.04em; }
       .filo { position: relative; justify-self: center; width: 1px; background: var(--linea); }
-      .filo i { position: absolute; left: -4px; top: 0; width: 9px; height: 9px; background: var(--blu); transform: rotate(45deg);
+      .filo i { position: absolute; left: -4px; top: 0; width: 9px; height: 9px; background: var(--accento); transform: rotate(45deg);
         animation-name: guida-scende; animation-timing-function: linear; animation-fill-mode: both; animation-timeline: --racconto; animation-range: contain 0% contain 100%; }
 
       /* margine stretto: le tappe sono scritte in verticale lungo il filo */

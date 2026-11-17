@@ -16,6 +16,15 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
     dell'azienda, in alto a destra, nel piede, nelle due aperture e come icona;
   - i colori di fondo passano da bianco freddo in cima a toni caldi in fondo, cambiando a ogni tappa
     della guida (vedi "Scorrimento"); la fascia scura finale è bruno caldo `#2C241E`, non più ardesia.
+- **Scelte cambiate dall'utente il 2026-11-17 (dopo la prova su iPhone)**:
+  - niente blu nei colori del sito (il logo resta com'è): pulsanti in antracite `--scuro`, piccoli accenti in
+    mattone `--accento` `#8A3A24` (segno della guida, numeri, barra Chiama su telefono);
+  - la home "sembrava un template": ora apre con il video a tutto schermo (nome dell'azienda, h1 e pulsanti
+    Chiama/WhatsApp), poi sezioni in grande; le sue foto "stonavano": in home niente foto dei lavori, solo
+    immagini d'atmosfera di qualità (per ora fotogrammi del video). L'utente vuole foto di repertorio di qualità
+    (come il video, da Pexels): da qui Pexels, Unsplash e Pixabay sono bloccati, deve caricarle lui;
+  - zoom tra le sezioni mentre si scorre (vedi "Scorrimento");
+  - Lavori a "ruota" come crl-2026.webflow.io/library (vedi "Scorrimento").
 - **Anteprime vecchie** (artifact privati dell'utente; si leggono con lo strumento Artifact). Servono solo come
   storico, ora fa fede il sito costruito:
   grafica https://claude.ai/artifact/8Fb5WGHMtMJ6gDYfgVgBQq ·
@@ -124,7 +133,16 @@ nessuna apertura se l'utente ha "riduci animazioni".
   Storia: una sfumatura troppo lieve non si notava; un cambio a scatti sulle tappe era "troppo netto".
   Va bene così: toni ben distinti ma passaggio sfumato. Se si cambiano i toni, ricontrollare il contrasto.
 
-- **Pagina Lavori come galleria** (richiesta dell'utente, riferimento spykercars.com): foto di misure diverse
+- **Zoom tra le sezioni** (richiesta dell'utente): script "zoom" in testa a `Base.astro`. Le sezioni
+  (`.zoom` in home, `.sezione` e `.invito` altrove, mai dentro `.ruota`) si rimpiccioliscono del 7% entrando
+  e uscendo, con angoli arrotondati e ombra, come fogli; il video della home si allontana e si scurisce.
+- **Lavori a ruota** (richiesta dell'utente, riferimento crl-2026.webflow.io/library, che da qui non si
+  riesce a far girare: la ruota è ricostruita dalle sue schermate): vista iniziale "Ruota", una carta per
+  foto su un grande cerchio che gira scorrendo; la carta al centro è grande e dritta, le vicine più piccole e
+  inclinate; scheda con numero, gruppo, titolo, nota e foto successiva; quando lo scorrimento si ferma la
+  ruota si posa sulla foto più vicina. Su telefono le foto si ingrandiscono arrivando al centro. La vista
+  "Elenco" è la galleria descritta qui sotto. Tutto in `src/pages/lavori.astro`.
+- **Pagina Lavori come galleria (vista Elenco)** (richiesta dell'utente, riferimento spykercars.com): foto di misure diverse
   alternate a sinistra e destra su 12 colonne e sfalsate in altezza (ogni lato resta nella sua metà, così non
   si toccano), coppie prima/dopo affiancate, una foto "larga" per gruppo (la prima orizzontale) che si allarga
   dai lati, didascalie piccole. Ogni foto entra "in cornice": ritagliata del 20% e ingrandita, si apre mentre
@@ -192,6 +210,9 @@ nessuna apertura se l'utente ha "riduci animazioni".
   in legno. In corso d'opera: doccia in muratura, massetto. Sono già leggere: il sito ne genera versioni AVIF/WebP per ogni schermo.
 - `materiali/logo/`: logo dell'azienda in SVG (colori originali e attenuati) e monogramma "Tetti".
 - `materiali/muro/`: foto del muro di mattoni, sagome e celle per l'apertura da computer.
+- `materiali/video/`: video di repertorio della home (Pexels 7816246, caricato dall'utente) e due fotogrammi
+  usati come immagini in home. Le versioni compresse per il sito sono in `public/video/` (1600 px per computer,
+  720 px ritagliata per telefono, immagini di attesa): rifarle con ffmpeg se cambia il video.
 - `contenuti/`: testi delle 9 pagine (home, 4 servizi, lavori, chi siamo, contatti, note legali).
 
 ## Codice del sito
@@ -272,3 +293,6 @@ nessuna apertura se l'utente ha "riduci animazioni".
 - 2026-11-17: l'utente chiede per la pagina Lavori impaginazione ed eleganza di spykercars.com. Fatta la
   galleria da rivista con cornici che si aprono scorrendo. Nota per riaprire quel sito con Playwright: un suo
   file `.../[...slug]/page-*.js` arriva sbagliato al browser; va intercettato e scaricato con curl.
+- 2026-11-17: dopo la prova su iPhone l'utente chiede: home meno "da template", zoom tra le sezioni, video dopo
+  l'apertura con nome e pulsanti, niente blu, foto di qualità in home, Lavori a ruota. Fatto tutto tranne le
+  foto di repertorio, che deve caricare lui (siti di foto bloccati da qui): per ora fotogrammi del video.

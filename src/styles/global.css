@@ -1,6 +1,7 @@
 /* A.M. Costruzioni: stile del sito.
    Impaginazione ariosa da rivista, allineata a sinistra: molto bianco, foto in cornice, filetti sottili.
-   I colori vengono dai cantieri (calce, pietra, terra) più il blu e il rosso del logo.
+   I colori vengono dai cantieri: calce, pietra, terra e mattone. Niente blu (scelta del cliente): pulsanti
+   scuri in antracite, piccoli accenti in mattone.
 
    COLORI CHE CAMBIANO SCORRENDO (richiesta del cliente, come nel sito di riferimento): la pagina ha quattro
    toni, uno per tappa della guida (Sopralluogo, Preventivo, Cantiere, Consegna), dal bianco freddo al caldo.
@@ -16,12 +17,12 @@
   --pietra: #525A61;     /* testi secondari */
   --antracite: #1F2327;  /* testi */
   --ardesia: #2C241E;    /* fascia scura in fondo alla pagina: bruno caldo */
-  --blu: #184898;        /* pulsanti e link */
-  --blu-scuro: #123A7C;
+  --accento: #8A3A24;    /* mattone: piccoli accenti (segno della guida, numeri, filo di "Scorri") */
+  --scuro: #1F2327;      /* pulsanti principali */
+  --scuro-2: #3A2E26;    /* pulsanti al passaggio del mouse */
   --rosso: #902020;      /* piccoli dettagli */
   --su-scuro: #F7F0E6;
   --su-scuro-2: #C2B6A8;
-  --blu-chiaro: #8FB2EE;
   --rosso-chiaro: #E27F74;
   --fd: 'Marcellus', 'Times New Roman', serif;
   --ft: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -56,9 +57,9 @@ h2 { font-size: clamp(1.85rem, 3.9vw, 2.9rem); }
 h3 { font-size: clamp(1.3rem, 2.2vw, 1.65rem); line-height: 1.15; }
 p { margin: 0; max-width: 62ch; }
 ul, ol { margin: 0; padding: 0; }
-a { color: var(--blu); text-underline-offset: 0.18em; }
-a:hover { color: var(--blu-scuro); }
-:focus-visible { outline: 2px solid var(--blu); outline-offset: 3px; }
+a { color: var(--antracite); text-underline-offset: 0.18em; }
+a:hover { color: var(--accento); }
+:focus-visible { outline: 2px solid var(--accento); outline-offset: 3px; }
 
 .salta { position: absolute; left: 12px; top: -80px; z-index: 60; padding: 10px 16px; background: var(--antracite); color: var(--calce); }
 .salta:focus { top: 12px; color: var(--calce); }
@@ -83,11 +84,11 @@ a:hover { color: var(--blu-scuro); }
   padding: 12px 24px;
   font: 500 1rem/1.25 var(--ft);
   text-decoration: none;
-  border: 1px solid var(--blu);
+  border: 1px solid var(--scuro);
   transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 }
-.b1 { background: var(--blu); color: #fff; }
-.b1:hover { background: var(--blu-scuro); border-color: var(--blu-scuro); color: #fff; }
+.b1 { background: var(--scuro); color: #fff; }
+.b1:hover { background: var(--scuro-2); border-color: var(--scuro-2); color: #fff; }
 .b2 { color: var(--antracite); border-color: var(--antracite); }
 .b2:hover { background: var(--antracite); color: var(--calce); }
 .azioni { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -110,6 +111,15 @@ a:hover { color: var(--blu-scuro); }
 .elenco, .prosa ul.elenco { list-style: none; display: grid; gap: 0; max-width: 46rem; padding-left: 0; }
 .elenco li { padding: 13px 0; border-top: 1px solid var(--linea); }
 .elenco li:last-child { border-bottom: 1px solid var(--linea); }
+
+/* Zoom tra le sezioni: --zoom va da 0 (piena) a 1 (lontana); lo scrive lo script "zoom" in Base.astro.
+   Le sezioni sono come fogli: allontanandosi si rimpiccioliscono, arrotondano gli angoli e fanno un'ombra
+   leggera, così si vede il passaggio da una all'altra. */
+.zoomata { transform: scale(calc(1 - var(--zoom) * 0.07)); border-radius: calc(var(--zoom) * 28px); box-shadow: 0 34px 70px -38px rgba(44, 36, 30, calc(var(--zoom) * 0.6)); overflow: clip; }
+.sezione.zoomata:not(.fascia) { background: var(--calce-2); }
+.zoom-vivo .sezione + .sezione { border-top-color: transparent; }
+.eroe.zoomata { transform: scale(calc(1 - var(--zoom) * 0.12)); border-radius: calc(var(--zoom) * 32px); }
+.eroe.zoomata .velatura { background-color: rgba(28, 22, 17, calc(var(--zoom) * 0.45)); }
 
 /* Comparsa lenta mentre si scorre: i titoli salgono da dietro una maschera, foto e passi compaiono con calma.
    La classe "moto" la mette lo script in testa alla pagina (Base.astro) solo se il browser può farlo e

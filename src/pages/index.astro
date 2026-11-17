@@ -1,83 +1,100 @@
 ---
+// Home. Dopo l'apertura c'è il video a tutto schermo con il nome dell'azienda e i pulsanti per chiamare;
+// poi le sezioni, impaginate in grande come una rivista. Mentre si scorre ogni sezione fa un leggero
+// zoom: si avvicina entrando e si allontana uscendo (script "zoom" in Base.astro, classe "zoom").
+// Le immagini della home NON sono foto di lavori dell'azienda: sono immagini d'atmosfera (per ora
+// fotogrammi del video di repertorio in materiali/video/). Le foto vere dei lavori stanno nella pagina Lavori.
+import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Azioni from '../components/Azioni.astro';
 import Blocchi from '../components/Blocchi.astro';
-import Foto from '../components/Foto.astro';
 import Guida from '../components/Guida.astro';
 import { pagina, sezione } from '../lib/testi';
-import { lavori } from '../data/foto';
-import { servizi } from '../data/sito';
+import { servizi, sito, zone } from '../data/sito';
 import { u } from '../lib/percorsi';
+import progetto from '../../materiali/video/fotogramma-2.jpg';
+import pianta from '../../materiali/video/fotogramma-13.5.jpg';
 
 const p = pagina('home');
 const grezzo = sezione(p, 'Dal grezzo al finito, un cantiere alla volta');
-const primaDopo = sezione(p, 'Prima e dopo');
 const serv = sezione(p, 'I nostri servizi');
 const come = sezione(p, 'Come lavoriamo');
 const dove = sezione(p, 'Dove lavoriamo');
 const invito = sezione(p, 'Hai un lavoro in mente?');
 const passi = come.blocchi.find((b) => b.tipo === 'ol');
 const pl = pagina('lavori');
-const scelti = ['soggiorno', 'tetto-coppi-posati', 'cucina-soggiorno', 'bagno-doccia'];
-const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
+const intro = p.intro.find((b) => b.tipo === 'p');
 ---
 <Base titolo={p.titolo} descrizione={p.descrizione}>
-  {/* Il "racconto": tutte le sezioni chiare. La guida a sinistra misura lo scorrimento di questo blocco. */}
+  <section class="eroe zoom" aria-labelledby="titolo-home">
+    <div class="schermo">
+      <video class="filmato" autoplay muted loop playsinline preload="metadata" poster={u('/video/apertura-poster.webp')} aria-hidden="true">
+        <source src={u('/video/apertura-720.mp4')} type="video/mp4" media="(max-width: 700px)" />
+        <source src={u('/video/apertura-1600.mp4')} type="video/mp4" />
+      </video>
+      <div class="velatura" aria-hidden="true"></div>
+      <div class="contenitore sopra">
+        <p class="etichetta">Impresa edile · {sito.comune} · dal {sito.dal}</p>
+        <h1 id="titolo-home">
+          <span class="nome">{sito.nome}</span>
+          <span class="sotto">{p.h1}</span>
+        </h1>
+        {intro?.tipo === 'p' && <p class="frase" set:html={intro.html} />}
+        <div class="su-scuro"><Azioni /></div>
+      </div>
+    </div>
+  </section>
+
+  {/* Il "racconto": le sezioni chiare. La guida a sinistra misura lo scorrimento di questo blocco. */}
   <div class="racconto">
   <Guida />
 
-  <section class="apertura-pagina contenitore">
-    <div class="pila testo">
-      <h1>{p.h1}</h1>
-      <Blocchi blocchi={p.intro} />
-      <Azioni />
-    </div>
-    <Foto nome="facciata-dopo" subito sizes="(min-width: 900px) 52vw, 92vw" proporzione="4 / 3" voci={[['Lavoro', 'Facciata, dopo i lavori'], ['Dove', "Fara Gera d'Adda"]]} />
-  </section>
-
-  <section class="sezione">
-    <div class="contenitore due">
-      <h2 class="maschera"><span>{grezzo.titolo}</span></h2>
-      <div class="pila"><Blocchi blocchi={grezzo.blocchi} /></div>
-    </div>
-    <div class="contenitore prima-dopo">
-      <Foto nome="facciata-prima" classe="prima entra" sizes="(min-width: 900px) 30vw, 60vw" voci={[['Stato', 'Prima']]} />
-      <Foto nome="facciata-dopo" classe="dopo entra" sizes="(min-width: 900px) 56vw, 92vw" voci={[['Stato', 'Dopo']]} />
-      <p class="tenue nota">{primaDopo.blocchi[0]?.tipo === 'p' && <Fragment set:html={primaDopo.blocchi[0].html} />}</p>
-    </div>
-  </section>
-
-  <section class="sezione fascia" id="servizi">
+  <section class="sezione zoom manifesto">
     <div class="contenitore">
+      <h2 class="maschera grande"><span>{grezzo.titolo}</span></h2>
+      <div class="manifesto-corpo">
+        <div class="testo-manifesto"><Blocchi blocchi={grezzo.blocchi} /></div>
+        <Picture class="quadro entra" src={pianta} formats={['avif', 'webp']} widths={[480, 800, 1200]} sizes="(min-width: 900px) 50vw, 92vw" alt="Pianta di una casa stampata su carta, appoggiata su un pavimento in cemento accanto a una livella." loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <section class="sezione zoom" id="servizi">
+    <div class="contenitore">
+      <p class="etichetta scura">Servizi</p>
       <h2 class="maschera"><span>{serv.titolo}</span></h2>
-      <ul class="servizi">
+      <ol class="servizi">
         {serv.sotto.map((s, i) => (
           <li>
             <a href={u(`/${servizi[i].slug}/`)}>
+              <span class="numero" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
               <h3>{s.titolo}</h3>
-              <div class="pila"><Blocchi blocchi={s.blocchi} /></div>
-              <span class="vai" aria-hidden="true">Scopri</span>
+              <div class="descrizione"><Blocchi blocchi={s.blocchi} /></div>
+              <span class="freccia" aria-hidden="true">→</span>
             </a>
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
   </section>
 
-  <section class="sezione">
-    <div class="contenitore due">
-      <h2 class="maschera"><span>{pl.h1}</span></h2>
-      <div class="pila"><Blocchi blocchi={pl.intro} /><a class="b2" href={u('/lavori/')}>Tutti i lavori</a></div>
-    </div>
-    <div class="contenitore sfalsata">
-      {vetrina.map((l) => (
-        <Foto nome={l.foto[0]} classe="entra" sizes="(min-width: 900px) 44vw, 92vw" voci={[['Lavoro', l.titolo]]} />
-      ))}
-    </div>
-  </section>
-
-  <section class="sezione fascia">
+  <section class="sezione zoom">
     <div class="contenitore">
+      <a class="vetrina" href={u('/lavori/')}>
+        <Picture class="vetrina-foto" src={progetto} formats={['avif', 'webp']} widths={[640, 1000, 1440]} sizes="(min-width: 1340px) 1240px, 94vw" alt="" loading="lazy" />
+        <span class="vetrina-testo">
+          <span class="etichetta">I nostri cantieri</span>
+          <span class="vetrina-titolo">{pl.h1}</span>
+          <span class="vetrina-frase">{pl.intro[0]?.tipo === 'p' && <Fragment set:html={pl.intro[0].html} />}</span>
+          <span class="vetrina-vai">Guarda i lavori <span aria-hidden="true">→</span></span>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <section class="sezione zoom">
+    <div class="contenitore">
+      <p class="etichetta scura">Metodo</p>
       <h2 class="maschera"><span>{come.titolo}</span></h2>
       {passi && passi.tipo === 'ol' && (
         <ol class="passi">
@@ -87,16 +104,20 @@ const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
     </div>
   </section>
 
-  <section class="sezione">
-    <div class="contenitore due">
-      <h2 class="maschera"><span>{dove.titolo}</span></h2>
-      <div class="pila"><Blocchi blocchi={dove.blocchi} /></div>
+  <section class="sezione zoom">
+    <div class="contenitore">
+      <p class="etichetta scura">{dove.titolo}</p>
+      <ul class="comuni" aria-label="Comuni in cui lavoriamo">
+        <li class="casa">{sito.comune}</li>
+        {zone.map((z) => <li>{z}</li>)}
+      </ul>
+      <div class="dove-testo"><Blocchi blocchi={dove.blocchi} /></div>
     </div>
   </section>
 
   </div>
 
-  <section class="invito su-scuro">
+  <section class="invito su-scuro zoom">
     <div class="contenitore pila">
       <h2>{invito.titolo}</h2>
       <Blocchi blocchi={invito.blocchi} />
@@ -105,43 +126,84 @@ const vetrina = scelti.map((n) => lavori().find((l) => l.foto[0] === n)!);
   </section>
 </Base>
 
+<script>
+  // Con "riduci animazioni" il video resta fermo sulla prima immagine.
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const v = document.querySelector<HTMLVideoElement>('.filmato');
+    v?.removeAttribute('autoplay'); v?.pause();
+  }
+</script>
+
 <style>
   .racconto { view-timeline-name: --racconto; view-timeline-axis: block; }
-  .apertura-pagina { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: end; gap: clamp(24px, 4.5vw, 72px); padding-block: clamp(32px, 6vw, 84px) clamp(56px, 8vw, 110px); }
-  .testo { gap: 26px; }
-  .due { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(20px, 4.5vw, 72px); align-items: start; }
-  .due :global(p) { font-size: 1.12rem; }
+  .etichetta { font-size: 0.74rem; letter-spacing: 0.18em; text-transform: uppercase; }
+  .etichetta.scura { color: var(--pietra); margin-bottom: 14px; }
 
-  .prima-dopo { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(16px, 3vw, 40px); align-items: end; margin-top: clamp(40px, 6vw, 88px); }
-  .prima-dopo :global(.prima) { margin-bottom: clamp(0px, 5vw, 72px); }
-  .nota { grid-column: 1 / -1; font-size: 0.95rem; }
+  /* Video a tutto schermo con nome e pulsanti */
+  .eroe { position: relative; }
+  .schermo { position: relative; height: calc(100svh - var(--testata)); min-height: 520px; overflow: hidden; background: #2C241E; color: #fff; display: grid; align-items: end; }
+  .filmato { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .velatura { position: absolute; inset: 0; background: linear-gradient(to top, rgba(28, 22, 17, 0.78) 0%, rgba(28, 22, 17, 0.45) 38%, rgba(28, 22, 17, 0.05) 70%); }
+  .sopra { position: relative; display: grid; gap: clamp(14px, 2vw, 22px); justify-items: start; padding-bottom: clamp(36px, 7vh, 80px); }
+  .sopra .etichetta { color: rgba(255, 255, 255, 0.82); }
+  h1 { display: grid; gap: clamp(8px, 1.2vw, 16px); }
+  .nome { font-size: clamp(3rem, 10vw, 8.6rem); line-height: 0.92; letter-spacing: -0.01em; }
+  .sotto { font-size: clamp(1.15rem, 2.2vw, 1.75rem); line-height: 1.2; color: rgba(255, 255, 255, 0.92); }
+  .frase { font-size: clamp(1rem, 1.3vw, 1.12rem); color: rgba(255, 255, 255, 0.86); max-width: 52ch; }
+  .sopra .su-scuro { margin-top: 6px; }
 
-  .servizi { list-style: none; margin-top: clamp(28px, 4vw, 52px); border-top: 1px solid var(--antracite); }
-  .servizi a { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr) auto; gap: 12px clamp(20px, 4.5vw, 72px); align-items: baseline; padding: clamp(22px, 3vw, 34px) 0; border-bottom: 1px solid var(--linea); color: var(--antracite); text-decoration: none; }
-  .servizi li:last-child a { border-bottom-color: var(--antracite); }
-  .servizi .vai { color: var(--blu); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
-  .servizi a:hover h3 { color: var(--blu); }
+  /* Manifesto */
+  .grande { font-size: clamp(2.4rem, 6.4vw, 5.6rem); line-height: 1.02; max-width: 16ch; }
+  .manifesto-corpo { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); gap: clamp(28px, 5vw, 88px); align-items: end; margin-top: clamp(36px, 6vw, 88px); }
+  .testo-manifesto :global(p) { font-size: clamp(1.1rem, 1.6vw, 1.32rem); line-height: 1.6; max-width: 34ch; }
+  .quadro { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
 
-  .sfalsata { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(36px, 6vw, 96px) clamp(18px, 3.5vw, 48px); align-items: start; margin-top: clamp(40px, 6vw, 88px); }
-  .sfalsata :global(.foto:nth-child(even)) { margin-top: clamp(40px, 9vw, 140px); }
+  /* Servizi: elenco grande, numerato */
+  .servizi { list-style: none; margin-top: clamp(28px, 4vw, 56px); border-top: 1px solid var(--antracite); }
+  .servizi a { display: grid; grid-template-columns: 4rem minmax(0, 7fr) minmax(0, 5fr) 2rem; gap: 10px clamp(16px, 3vw, 44px); align-items: baseline; padding: clamp(24px, 3.4vw, 44px) 0; border-bottom: 1px solid var(--linea); color: var(--antracite); text-decoration: none; transition: padding 0.5s var(--morbido); }
+  .servizi .numero { font-size: 0.8rem; letter-spacing: 0.12em; color: var(--accento); }
+  .servizi h3 { font-size: clamp(1.7rem, 3.6vw, 3.1rem); line-height: 1.05; transition: transform 0.5s var(--morbido); }
+  .servizi .descrizione :global(p) { color: var(--pietra); font-size: 1rem; }
+  .servizi .freccia { font-size: 1.5rem; justify-self: end; transition: transform 0.5s var(--morbido); }
+  .servizi a:hover h3 { transform: translateX(12px); }
+  .servizi a:hover .freccia { transform: translateX(6px); color: var(--accento); }
 
-  .passi { list-style: none; counter-reset: passo; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px clamp(20px, 3vw, 44px); margin-top: clamp(28px, 4vw, 52px); }
-  .passi li { counter-increment: passo; padding-top: 16px; border-top: 1px solid var(--antracite); }
-  .passi li::before { content: counter(passo); display: block; font-family: var(--fd); font-size: 2.4rem; line-height: 1; margin-bottom: 14px; color: var(--blu); }
+  /* Vetrina verso la pagina Lavori */
+  .vetrina { position: relative; display: grid; overflow: hidden; color: #fff; text-decoration: none; min-height: clamp(380px, 62vh, 640px); background: #2C241E; }
+  .vetrina :global(.vetrina-foto) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--morbido); }
+  .vetrina::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, rgba(28, 22, 17, 0.8), rgba(28, 22, 17, 0.25) 70%); }
+  .vetrina:hover :global(.vetrina-foto) { transform: scale(1.04); }
+  .vetrina-testo { position: relative; z-index: 1; display: grid; gap: 14px; align-content: end; justify-items: start; padding: clamp(24px, 5vw, 64px); max-width: 40rem; }
+  .vetrina-titolo { font-family: var(--fd); font-size: clamp(2.6rem, 7vw, 6rem); line-height: 1; }
+  .vetrina-frase { font-size: 1.08rem; color: rgba(255, 255, 255, 0.88); }
+  .vetrina-vai { margin-top: 8px; padding: 12px 22px; border: 1px solid rgba(255, 255, 255, 0.85); font-weight: 500; }
+  .vetrina:hover .vetrina-vai { background: #fff; color: var(--antracite); }
+
+  /* Come lavoriamo */
+  .passi { list-style: none; counter-reset: passo; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px clamp(20px, 3vw, 44px); margin-top: clamp(32px, 5vw, 64px); }
+  .passi li { counter-increment: passo; padding-top: 18px; border-top: 1px solid var(--antracite); }
+  .passi li::before { content: '0' counter(passo); display: block; font-family: var(--fd); font-size: clamp(2.6rem, 4.5vw, 4rem); line-height: 1; margin-bottom: 18px; color: var(--accento); }
   .passi :global(strong) { display: block; font-weight: 600; margin-bottom: 4px; }
+
+  /* Dove lavoriamo: i comuni scritti in grande */
+  .comuni { list-style: none; display: flex; flex-wrap: wrap; gap: 0.1em 0.5em; font-family: var(--fd); font-size: clamp(1.9rem, 5vw, 4.4rem); line-height: 1.15; }
+  .comuni li { color: var(--pietra); }
+  .comuni li:not(:last-child)::after { content: '·'; margin-left: 0.5em; color: var(--linea); }
+  .comuni .casa { color: var(--antracite); }
+  .dove-testo { margin-top: clamp(24px, 3vw, 40px); }
+  .dove-testo :global(p) { color: var(--pietra); max-width: 60ch; }
 
   .invito { background: var(--ardesia); color: var(--su-scuro); padding-block: clamp(60px, 9vw, 120px); }
   .invito :global(p) { font-size: 1.15rem; color: var(--su-scuro-2); }
 
   @media (max-width: 900px) {
-    .apertura-pagina, .due { grid-template-columns: minmax(0, 1fr); }
-    .servizi a { grid-template-columns: minmax(0, 1fr); }
+    .manifesto-corpo { grid-template-columns: minmax(0, 1fr); }
+    .servizi a { grid-template-columns: 2.6rem minmax(0, 1fr) 1.4rem; }
+    .servizi .descrizione { grid-column: 2 / 3; }
     .passi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   @media (max-width: 560px) {
-    .sfalsata, .prima-dopo { grid-template-columns: minmax(0, 1fr); }
-    .sfalsata :global(.foto:nth-child(even)) { margin-top: 0; }
-    .prima-dopo :global(.prima) { margin-bottom: 0; max-width: 70%; }
     .passi { grid-template-columns: minmax(0, 1fr); }
+    .schermo { min-height: 480px; }
   }
 </style>
