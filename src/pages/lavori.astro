@@ -165,8 +165,6 @@ function impagina(lista: Lavoro[]): Posto[] {
   :global(html.galleria-viva) .lavoro :global(.svela picture) { display: block; overflow: hidden; clip-path: inset(calc(var(--apri, 1) * 20%)); will-change: clip-path; }
   :global(html.galleria-viva) .lavoro :global(.svela.larga picture) { clip-path: inset(calc(var(--apri, 1) * 6%) calc(var(--apri, 1) * 18%)); }
   :global(html.galleria-viva) .lavoro :global(.svela img) { transform: translate3d(0, calc(var(--sposta, 0) * 4%), 0) scale(calc(1.08 + var(--apri, 1) * 0.12)); transform-origin: 50% 50%; will-change: transform; }
-  /* il cartiglio sotto la foto compare quando la cornice è quasi aperta */
-  :global(html.galleria-viva) .lavoro :global(.svela figcaption) { opacity: calc(1 - var(--apri, 1) * 2); }
 
   .invito { background: var(--ardesia); color: var(--su-scuro); padding-block: clamp(56px, 8vw, 104px); }
   .invito p { font-size: 1.15rem; color: var(--su-scuro-2); }
