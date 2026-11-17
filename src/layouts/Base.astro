@@ -96,10 +96,9 @@ const scheda = {
       })();
     </script>
     <script is:inline>
-      // Zoom tra le sezioni (richiesta del cliente). Ogni elemento con classe "zoom" è un po' più piccolo
-      // mentre entra dal basso, arriva a grandezza piena quando occupa lo schermo e si rimpicciolisce di nuovo
-      // uscendo in alto: un leggero zoom in / zoom out tra una sezione e l'altra. Il video in cima si allontana
-      // e si scurisce mentre si scende. Niente di tutto questo con "riduci animazioni".
+      // Zoom tra le sezioni (richiesta del cliente). Il contenuto di ogni sezione è un po' più piccolo mentre
+      // entra dal basso, arriva a grandezza piena quando occupa lo schermo e si rimpicciolisce di nuovo uscendo
+      // in alto. Il fondo non si muove (vedi global.css). Il video in cima si avvicina e si scurisce scendendo. Niente di tutto questo con "riduci animazioni".
       (function () {
         var d = document.documentElement;
         if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -116,7 +115,7 @@ const scheda = {
             var z = Math.max(entra, esce);
             z = z * z * (3 - 2 * z); // morbido
             e.style.setProperty('--zoom', z.toFixed(4));
-            e.style.transformOrigin = entra >= esce ? '50% 0' : '50% 100%';
+            e.style.setProperty('--origine', entra >= esce ? '50% 0' : '50% 100%');
             e.classList.toggle('zoomata', z > 0.001);
           }
         }
