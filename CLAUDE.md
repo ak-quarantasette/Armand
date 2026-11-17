@@ -124,6 +124,14 @@ nessuna apertura se l'utente ha "riduci animazioni".
   Storia: una sfumatura troppo lieve non si notava; un cambio a scatti sulle tappe era "troppo netto".
   Va bene così: toni ben distinti ma passaggio sfumato. Se si cambiano i toni, ricontrollare il contrasto.
 
+- **Pagina Lavori come galleria** (richiesta dell'utente, riferimento spykercars.com): foto di misure diverse
+  alternate a sinistra e destra su 12 colonne e sfalsate in altezza (ogni lato resta nella sua metà, così non
+  si toccano), coppie prima/dopo affiancate, una foto "larga" per gruppo (la prima orizzontale) che si allarga
+  dai lati, didascalie piccole. Ogni foto entra "in cornice": ritagliata del 20% e ingrandita, si apre mentre
+  si scorre e poi scorre un filo più lenta della pagina. Tutto in `src/pages/lavori.astro` (impaginazione nel
+  codice in testa, movimento nello script in fondo). Su telefono una colonna con larghezze alternate.
+  Il sito di riferimento qui si apre solo passando i file con `[` nel nome tramite curl (vedi registro).
+
 ## Pubblicazione
 
 - **Modalità anteprima**: finché `DOMINIO` in `astro.config.mjs` è vuoto, ogni pagina ha `noindex`, niente
@@ -261,3 +269,6 @@ nessuna apertura se l'utente ha "riduci animazioni".
   angolo), quindi le due foto sono ora una coppia prima/dopo in Lavori.
 - 2026-11-17: su richiesta dell'utente tolta da Chi siamo la frase "Siamo un'impresa piccola…": non
   descrivere l'azienda come piccola.
+- 2026-11-17: l'utente chiede per la pagina Lavori impaginazione ed eleganza di spykercars.com. Fatta la
+  galleria da rivista con cornici che si aprono scorrendo. Nota per riaprire quel sito con Playwright: un suo
+  file `.../[...slug]/page-*.js` arriva sbagliato al browser; va intercettato e scaricato con curl.
