@@ -113,13 +113,16 @@ a:hover { color: var(--accento); }
 .elenco li:last-child { border-bottom: 1px solid var(--linea); }
 
 /* Zoom tra le sezioni: --zoom va da 0 (piena) a 1 (lontana); lo scrive lo script "zoom" in Base.astro.
-   Le sezioni sono come fogli: allontanandosi si rimpiccioliscono, arrotondano gli angoli e fanno un'ombra
-   leggera, così si vede il passaggio da una all'altra. */
-.zoomata { transform: scale(calc(1 - var(--zoom) * 0.07)); border-radius: calc(var(--zoom) * 28px); box-shadow: 0 34px 70px -38px rgba(44, 36, 30, calc(var(--zoom) * 0.6)); overflow: clip; }
-.sezione.zoomata:not(.fascia) { background: var(--calce-2); }
-.zoom-vivo .sezione + .sezione { border-top-color: transparent; }
-.eroe.zoomata { transform: scale(calc(1 - var(--zoom) * 0.12)); border-radius: calc(var(--zoom) * 32px); }
+   Si rimpicciolisce solo il CONTENUTO della sezione (titoli, testi, immagini): il fondo resta fermo e uguale
+   alla pagina, così non si vede la sagoma della sezione (l'utente non la voleva). Nel video in cima è il video
+   che si avvicina dentro lo schermo mentre si scende, e la scritta si allontana. */
+.zoomata > .contenitore { transform: scale(calc(1 - var(--zoom) * 0.08)); transform-origin: var(--origine, 50% 50%); }
+.eroe.zoomata > .contenitore { transform: none; }
+.eroe.zoomata .filmato { transform: scale(calc(1 + var(--zoom) * 0.18)); }
+.eroe.zoomata .sopra { transform: scale(calc(1 - var(--zoom) * 0.1)) translateY(calc(var(--zoom) * -40px)); transform-origin: 0 100%; opacity: calc(1 - var(--zoom) * 0.6); }
 .eroe.zoomata .velatura { background-color: rgba(28, 22, 17, calc(var(--zoom) * 0.45)); }
+/* con lo zoom attivo niente righe tra le sezioni: sembrerebbero di nuovo bordi */
+.zoom-vivo .sezione + .sezione { border-top-color: transparent; }
 
 /* Comparsa lenta mentre si scorre: i titoli salgono da dietro una maschera, foto e passi compaiono con calma.
    La classe "moto" la mette lo script in testa alla pagina (Base.astro) solo se il browser può farlo e

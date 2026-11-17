@@ -134,8 +134,10 @@ nessuna apertura se l'utente ha "riduci animazioni".
   Va bene così: toni ben distinti ma passaggio sfumato. Se si cambiano i toni, ricontrollare il contrasto.
 
 - **Zoom tra le sezioni** (richiesta dell'utente): script "zoom" in testa a `Base.astro`. Le sezioni
-  (`.zoom` in home, `.sezione` e `.invito` altrove, mai dentro `.ruota`) si rimpiccioliscono del 7% entrando
-  e uscendo, con angoli arrotondati e ombra, come fogli; il video della home si allontana e si scurisce.
+  (`.zoom` in home, `.sezione` e `.invito` altrove, mai dentro `.ruota`) entrando e uscendo rimpiccioliscono
+  dell'8% solo il CONTENUTO (`> .contenitore`): il fondo resta fermo e uguale alla pagina, senza righe tra le
+  sezioni. Una prima versione con fogli (fondo più chiaro, angoli, ombra) non è piaciuta: si vedeva la sagoma
+  delle sezioni. Nel video della home è il video che si avvicina dentro lo schermo e la scritta si allontana.
 - **Lavori a ruota** (richiesta dell'utente, riferimento crl-2026.webflow.io/library, che da qui non si
   riesce a far girare: la ruota è ricostruita dalle sue schermate): vista iniziale "Ruota", una carta per
   foto su un grande cerchio che gira scorrendo; la carta al centro è grande e dritta, le vicine più piccole e
@@ -306,3 +308,5 @@ nessuna apertura se l'utente ha "riduci animazioni".
 - 2026-11-17: l'utente segnala la ruota poco reattiva e la seconda foto che non esce. Rifatta: una foto per
   gesto (dito, rotella, trackpad), ruota subito sotto l'intestazione, movimento morbido, foto vicine visibili
   ai lati anche su telefono.
+- 2026-11-17: l'utente non vuole vedere la sagoma delle sezioni che si rimpiccioliscono. Ora lo zoom tocca solo
+  il contenuto; il fondo resta continuo.
