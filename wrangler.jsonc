@@ -1,10 +1,15 @@
-// Cloudflare (Workers, solo file statici): pubblica la cartella dist/ creata da "npm run build".
-// Il nome qui sotto deve restare uguale al nome del progetto scelto su Cloudflare.
+// Cloudflare (Workers): pubblica la cartella dist/ creata da "npm run build".
+// Il nome qui sotto deve restare uguale al nome del progetto su Cloudflare ("armand").
+// Tutti i file sono serviti direttamente da Cloudflare; solo i video passano dal piccolo programma
+// cloudflare/video.js, che li manda "a pezzi" come vuole il Safari dell'iPhone.
 {
   "name": "armand",
+  "main": "cloudflare/video.js",
   "compatibility_date": "2026-11-16",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "404-page"
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/video/*"]
   }
 }

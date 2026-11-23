@@ -167,6 +167,8 @@ nessuna apertura se l'utente ha "riduci animazioni".
   indirizzo canonico e niente sitemap. Scrivendo lì il dominio il sito diventa indicizzabile da solo.
   Non dimenticarlo quando arriva il dominio: è l'unico interruttore.
 - **Cloudflare** (definitivo): `wrangler.jsonc` pubblica `dist/` come sito statico su Workers, con pagina 404.
+  Solo i video (`/video/*`) passano da `cloudflare/video.js`, che risponde "a pezzi" (206) come vuole Safari
+  su iPhone: i file statici di Cloudflare mandano sempre il file intero e il video della home non partirebbe.
   Nella dashboard: Workers & Pages → Create application → Import a repository → repo `Armand`, nome progetto
   `armand` (uguale a `wrangler.jsonc`, altrimenti la costruzione fallisce), build `npm run build`, deploy
   `npx wrangler deploy`. Indirizzo gratuito `armand.<account>.workers.dev`. `public/_headers` tiene
@@ -316,3 +318,5 @@ nessuna apertura se l'utente ha "riduci animazioni".
   il contenuto; il fondo resta continuo.
 - 2026-11-23: l'utente chiede il dominio più economico (vedi "Progetto") e il logo come anteprima del link al
   posto della foto della facciata. Fatto.
+- 2026-11-23: sito provato su `armand.kovacajandrea.workers.dev`: tutto a posto tranne il video, che Cloudflare
+  mandava sempre intero (Safari su iPhone lo vuole a pezzi). Aggiunto `cloudflare/video.js`, provato con `wrangler dev`.
