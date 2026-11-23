@@ -5,12 +5,10 @@ import '@fontsource/ibm-plex-sans/latin-400.css';
 import '@fontsource/ibm-plex-sans/latin-500.css';
 import '@fontsource/ibm-plex-sans/latin-600.css';
 import '../styles/global.css';
-import { getImage } from 'astro:assets';
 import Intestazione from '../components/Intestazione.astro';
 import Piede from '../components/Piede.astro';
 import Apertura from '../components/Apertura.astro';
 import { sito, zone, telHref, waHref } from '../data/sito';
-import { foto } from '../data/foto';
 import { u } from '../lib/percorsi';
 
 interface Props { titolo: string; descrizione: string; indicizza?: boolean; }
@@ -18,8 +16,8 @@ const { titolo, descrizione, indicizza = true } = Astro.props;
 // Gli indirizzi completi si possono scrivere solo quando si sa dove sta il sito (dominio o anteprima nota).
 const assoluto = (percorso: string) => (sito.origine ? new URL(percorso, sito.origine).href : '');
 const canonico = assoluto(Astro.url.pathname);
-const copertina = await getImage({ src: foto('facciata-dopo'), width: 1200, height: 630, format: 'jpg', fit: 'cover' });
-const copertinaUrl = assoluto(copertina.src) || copertina.src;
+// anteprima del link (WhatsApp, Facebook, messaggi): il logo, creato da src/pages/anteprima-link.png.ts
+const copertinaUrl = assoluto(u('/anteprima-link.png')) || u('/anteprima-link.png');
 const tel = telHref(sito.tel1) || u('/contatti/');
 const wa = waHref() || u('/contatti/');
 
@@ -27,7 +25,7 @@ const scheda = {
   '@context': 'https://schema.org',
   '@type': 'GeneralContractor',
   name: sito.nome,
-  ...(sito.origine ? { url: assoluto(u('/')), image: copertinaUrl } : {}),
+  ...(sito.origine ? { url: assoluto(u('/')), image: copertinaUrl, logo: copertinaUrl } : {}),
   foundingDate: String(sito.dal),
   ...(sito.tel1 ? { telephone: sito.tel1 } : {}),
   ...(sito.email ? { email: sito.email } : {}),
@@ -55,6 +53,9 @@ const scheda = {
     <meta property="og:description" content={descrizione} />
     {canonico && <meta property="og:url" content={canonico} />}
     <meta property="og:image" content={copertinaUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Logo A.M. Costruzioni snc" />
     <meta name="twitter:card" content="summary_large_image" />
     <script type="application/ld+json" set:html={JSON.stringify(scheda)} />
     <script is:inline>

@@ -46,7 +46,9 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 - **Contatti da pubblicare**: due numeri di telefono, un'email e il comune (Fara Gera d'Adda 24045, BG).
   Stanno in `src/data/sito.ts` insieme ai dati legali (vedi "Riservatezza").
 - **Canali di contatto sul sito**: chiamata, WhatsApp, email. Niente modulo, niente cookie, niente banner.
-- **Dominio**: non esiste ancora. Proposte da verificare: amcostruzionisnc.it, am-costruzioni.it, amcostruzionifara.it.
+- **Dominio**: non esiste ancora. Al 2026-11-23 `amcostruzionisnc.it` e `amcostruzionifara.it` risultano liberi,
+  `am-costruzioni.it` è già preso. Cloudflare non vende i .it: va comprato altrove (consigliati OVHcloud o Netsons,
+  per il rinnovo più basso) e collegato a Cloudflare cambiando i nameserver.
 - **Vecchio sito**: una pagina Jimdo provvisoria, da cancellare quando il nuovo è online. Nessun posizionamento da preservare.
 
 ## Decisioni prese (piano approvato il 2026-11-16, non riaprirle)
@@ -235,6 +237,8 @@ nessuna apertura se l'utente ha "riduci animazioni".
 - `src/components/`: Intestazione, Piede, Apertura (logo e lamelle), Foto, Azioni, Guida.
 - `src/scripts/muro.js`: apertura a mattoni; usa `public/apertura/` e `materiali/muro/celle.json`.
 - `src/pages/`: home, `[servizio]` (4 pagine), lavori, chi-siamo, contatti, note-legali, 404, robots.txt.
+- Anteprima del link (WhatsApp, Facebook): è il logo, non una foto (richiesta dell'utente). PNG 1200x630 creato
+  da `src/pages/anteprima-link.png.ts` con sharp dal logo vero; usato in `og:image` e come `logo` nei dati per Google.
 - Prova: `npm run build`, servire `dist/` (`python3 -m http.server -d dist`) e guardare con Playwright.
   Per provare come su Cloudflare (404, barre finali, intestazioni): `npx wrangler dev`.
 
@@ -310,3 +314,5 @@ nessuna apertura se l'utente ha "riduci animazioni".
   ai lati anche su telefono.
 - 2026-11-17: l'utente non vuole vedere la sagoma delle sezioni che si rimpiccioliscono. Ora lo zoom tocca solo
   il contenuto; il fondo resta continuo.
+- 2026-11-23: l'utente chiede il dominio più economico (vedi "Progetto") e il logo come anteprima del link al
+  posto della foto della facciata. Fatto.
