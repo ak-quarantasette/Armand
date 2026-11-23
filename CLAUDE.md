@@ -4,7 +4,7 @@ Claude legge questo file a inizio sessione: contiene tutto il contesto, quindi n
 Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 
 
-## Stato (aggiornato 2026-11-16)
+## Stato (aggiornato 2026-11-23)
 
 - **Fase in corso**: fasi 1-3 chiuse. Fase 4 (verifiche) fatta con Chromium su telefono, tablet e computer;
   manca solo la prova su iPhone, che fa l'utente. Fase 5 (pubblicazione) avviata: il sito è su `main` e
@@ -31,12 +31,11 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
   prototipo "La posa" https://claude.ai/artifact/EmAnJNbVSZL4S1vYoGRsTX ·
   testi https://claude.ai/artifact/6gQLwvxVkgP78eZmE5bhvb ·
   schermate della prima versione https://claude.ai/artifact/MBtbF8rMkiibHqMq1uv5XL.
-- **Prossimo passo**: l'utente guarda l'anteprima da iPhone e da computer e dice cosa cambiare. Poi Cloudflare
-  per il sito definitivo.
-- **In attesa dall'utente**:
-  - commenti sull'anteprima e prova su iPhone;
-  - creare il progetto su Cloudflare (passi in "Pubblicazione") quando vuole pubblicare davvero;
-  - il dominio (proposte in "Progetto"): quando c'è, va scritto in `astro.config.mjs`.
+- **Sito online** (2026-11-23): https://amcostruzionisnc.it su Cloudflare, indicizzabile (`DOMINIO` scritto).
+- **Prossimo passo**: aggiungere `www.amcostruzionisnc.it` che rimandi al dominio senza www, poi Search Console,
+  scheda Google Business Profile, cancellazione della pagina Jimdo.
+- **In attesa dall'utente**: foto di repertorio per la home; email sul dominio (Zimbra di OVH non chiaro: i
+  record MX non ci sono, quindi per ora nessuna email @amcostruzionisnc.it funziona).
 
 ## Progetto
 
@@ -46,9 +45,8 @@ Va aggiornato a ogni modifica (sezioni "Stato" e "Registro") e tenuto breve.
 - **Contatti da pubblicare**: due numeri di telefono, un'email e il comune (Fara Gera d'Adda 24045, BG).
   Stanno in `src/data/sito.ts` insieme ai dati legali (vedi "Riservatezza").
 - **Canali di contatto sul sito**: chiamata, WhatsApp, email. Niente modulo, niente cookie, niente banner.
-- **Dominio**: non esiste ancora. Al 2026-11-23 `amcostruzionisnc.it` e `amcostruzionifara.it` risultano liberi,
-  `am-costruzioni.it` è già preso. Cloudflare non vende i .it: va comprato altrove (consigliati OVHcloud o Netsons,
-  per il rinnovo più basso) e collegato a Cloudflare cambiando i nameserver.
+- **Dominio**: `amcostruzionisnc.it`, comprato dall'utente su OVHcloud il 2026-11-23 come persona fisica,
+  nameserver di Cloudflare (nancy, yadiel), collegato al Worker `armand` come dominio personalizzato.
 - **Vecchio sito**: una pagina Jimdo provvisoria, da cancellare quando il nuovo è online. Nessun posizionamento da preservare.
 
 ## Decisioni prese (piano approvato il 2026-11-16, non riaprirle)
@@ -163,9 +161,9 @@ nessuna apertura se l'utente ha "riduci animazioni".
 
 ## Pubblicazione
 
-- **Modalità anteprima**: finché `DOMINIO` in `astro.config.mjs` è vuoto, ogni pagina ha `noindex`, niente
-  indirizzo canonico e niente sitemap. Scrivendo lì il dominio il sito diventa indicizzabile da solo.
-  Non dimenticarlo quando arriva il dominio: è l'unico interruttore.
+- **Modalità anteprima**: se `DOMINIO` in `astro.config.mjs` è vuoto, ogni pagina ha `noindex`, niente
+  indirizzo canonico e niente sitemap. Dal 2026-11-23 vale `https://amcostruzionisnc.it`, tranne quando c'è
+  `SITO_BASE` (l'anteprima di GitHub Pages, che resta fuori da Google).
 - **Cloudflare** (definitivo): `wrangler.jsonc` pubblica `dist/` come sito statico su Workers, con pagina 404.
   Solo i video (`/video/*`) passano da `cloudflare/video.js`, che risponde "a pezzi" (206) come vuole Safari
   su iPhone: i file statici di Cloudflare mandano sempre il file intero e il video della home non partirebbe.
@@ -320,3 +318,5 @@ nessuna apertura se l'utente ha "riduci animazioni".
   posto della foto della facciata. Fatto.
 - 2026-11-23: sito provato su `armand.kovacajandrea.workers.dev`: tutto a posto tranne il video, che Cloudflare
   mandava sempre intero (Safari su iPhone lo vuole a pezzi). Aggiunto `cloudflare/video.js`, provato con `wrangler dev`.
+- 2026-11-23: dominio `amcostruzionisnc.it` attivo su Cloudflare e collegato; scritto in `DOMINIO`: sito
+  indicizzabile con canonico e sitemap. Provati pagine, 404 e video (206) sul dominio.
